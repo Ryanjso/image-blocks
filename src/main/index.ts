@@ -6,10 +6,13 @@ import icon from '../../resources/icon.png?asset'
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
+    width: 1080,
+    minWidth: 840,
+    height: 720,
     show: false,
     autoHideMenuBar: true,
+    titleBarStyle: 'hiddenInset',
+    trafficLightPosition: { x: 20, y: 20 },
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
