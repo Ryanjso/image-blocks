@@ -1,6 +1,14 @@
-import { Play, PlusCircle } from 'lucide-react'
+import { FlipHorizontal, PenLine, Play, PlusCircle, Scaling, Scissors, Shrink } from 'lucide-react'
 import { Arrow } from './assets/svg/arrow'
 import { Curve } from './assets/svg/curve'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from './components/ui/DropdownMenu'
 
 function App(): JSX.Element {
   // const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
@@ -8,7 +16,7 @@ function App(): JSX.Element {
   return (
     <div>
       <div className="p-3 draggable">
-        <div className="bg-white h-20 rounded-t-lg rounded-b-3xl border-2 border-slate-200 flex justify-end px-5">
+        <div className="bg-background h-20 rounded-t-lg rounded-b-3xl border-2 border-slate-200 flex justify-end px-5">
           <button className="bg-indigo-500 text-white px-5 py-2 rounded-3xl self-center flex items-center space-x-4 no-drag">
             <span className="text-sm font-semibold">Run</span>
             <Play size={16} strokeWidth={2} />
@@ -17,17 +25,25 @@ function App(): JSX.Element {
       </div>
 
       <div className="px-3 flex space-x-3">
-        <div className="bg-white w-full h-64 rounded-3xl border-2 border-slate-200 p-3 relative">
+        <div className="bg-background w-full h-64 rounded-3xl border-2 border-slate-200 p-3 relative">
           <div className="absolute top-[calc(100%+6px)] left-1/2 -translate-x-1/2">
             <Curve className="scale-x-[-1] rotate-180" />
           </div>
-          <div className="w-full h-full bg-indigo-100 border-dashed border-indigo-400 border-[3px] rounded-2xl flex flex-col justify-center ">
-            <span className="text-indigo-400 font-bold text-center text-sm">Drop files here</span>
+          <div className="w-full h-full bg-indigo-100 border-dashed border-indigo-400 border-[3px] rounded-2xl flex flex-col justify-center space-y-4">
+            <span className="text-indigo-400 font-bold text-center text-sm font-sans">
+              Drop files here
+            </span>
 
-            <div>
-              <label>Image Upload</label>
+            <div className="flex justify-center">
+              <label
+                htmlFor="file-upload"
+                className="cursor-pointer inline-block px-4 py-2 bg-indigo-500 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700"
+              >
+                Browse Files
+              </label>
               <input
-                className="inline"
+                id="file-upload"
+                className="hidden"
                 type="file"
                 accept="image/*"
                 multiple
@@ -44,7 +60,7 @@ function App(): JSX.Element {
             </div>
           </div>
         </div>
-        <div className="bg-white w-full h-64 rounded-3xl border-2 p-3 border-slate-200 relative">
+        <div className="bg-background w-full h-64 rounded-3xl border-2 p-3 border-slate-200 relative">
           <div className="absolute top-[calc(100%+4.5px)] left-1/2 -translate-x-1/2">
             <Arrow />
           </div>
@@ -56,16 +72,45 @@ function App(): JSX.Element {
             <hr className="border-slate-300 border-[2px] w-full" />
             <hr className="border-slate-300 border-[2px] w-full" />
           </div>
-          <div className="absolute left-1/2 -translate-x-1/2 h-2  top-0">
+          <div className="absolute left-1/2 -translate-x-1/2 h-2 top-0">
             <Curve className="absolute left-[calc(50%+11px)] -translate-x-1/2" />
             <Curve className="scale-x-[-1] absolute top-0 left-[calc(50%-11px)] -translate-x-1/2" />
           </div>
         </div>
         <div className="flex justify-center mt-11">
-          <button className="bg-white rounded-3xl border-2 border-slate-200 p-3 px-6 self-center flex items-center space-x-3">
-            <PlusCircle />
-            <h2 className="font-medium text-sm">Add your first block</h2>
-          </button>
+          {/* <button className="bg-background rounded-3xl border-2 border-slate-200 p-3 px-6 self-center flex items-center space-x-3"> */}
+          <DropdownMenu>
+            <DropdownMenuTrigger className="bg-background rounded-3xl border-2 border-slate-200 p-3 px-6 self-center flex items-center space-x-3">
+              <PlusCircle />
+              <h2 className="font-medium text-sm">Add your first block</h2>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+              {/* <DropdownMenuLabel>My Account</DropdownMenuLabel> */}
+              {/* <DropdownMenuSeparator /> */}
+              <DropdownMenuItem>
+                <FlipHorizontal className="mr-2 h-4 w-4" />
+                <span>Convert image type</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Shrink className="mr-2 h-4 w-4" />
+                <span>Compress image</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Scaling className="mr-2 h-4 w-4" />
+                <span>Resize image</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <PenLine className="mr-2 h-4 w-4" />
+                <span>Rename image</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Scissors className="mr-2 h-4 w-4" />
+                <span>Trim transparent pixels</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* </button> */}
         </div>
       </div>
     </div>
