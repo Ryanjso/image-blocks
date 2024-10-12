@@ -1,9 +1,14 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, protocol, net } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
+import * as fs from 'fs'
+import * as path from 'path'
+
 function createWindow(): void {
+  console.log('CREATING WINDOWS')
+
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 1080,
@@ -52,10 +57,31 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
+  // Register a custom protocol to serve local files
+  protocol.handle('local-file', async (request) => {
+    const filePath = decodeURIComponent(request.url.replace('local-file://', ''))
+    return net.fetch(`file://${filePath}`)
+  })
+
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
 
   createWindow()
+
+  ipcMain.handle('rename-file', async (_event, oldPath: string, newName: string) => {
+    try {
+      const directory = path.dirname(oldPath)
+      const originalExtension = path.extname(oldPath) // Extract the original extension
+      const newFileName = newName + originalExtension // Append original extension to the new name
+      const newPath = path.join(directory, newFileName)
+
+      fs.renameSync(oldPath, newPath) // Rename the file
+      return newPath // Return the new path after renaming
+    } catch (err) {
+      if (err instanceof Error) return { error: err.message } // Return error if renaming fails
+      return { error: 'An unknown error occurred' }
+    }
+  })
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
