@@ -2,6 +2,8 @@ import { app, shell, BrowserWindow, ipcMain, protocol, net } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import sharp from 'sharp'
+import { ProcessedImage } from '../types'
 
 import * as fs from 'fs'
 import * as path from 'path'
@@ -82,6 +84,36 @@ app.whenReady().then(() => {
       return { error: 'An unknown error occurred' }
     }
   })
+
+  ipcMain.handle(
+    'process-images',
+    async (_event, imagePaths: string[]): Promise<ProcessedImage[]> => {
+      try {
+        console.log('Processing images:', imagePaths)
+        const processedImages = await Promise.all(
+          imagePaths.map(async (imagePath) => {
+            const metadata = await sharp(imagePath).metadata()
+
+            // dont use sharp size here, its only for specific use cases instead use fs
+            const stats = fs.statSync(imagePath)
+            const fileSizeInBytes = stats.size
+
+            return {
+              path: imagePath,
+              size: fileSizeInBytes,
+              name: path.basename(imagePath),
+              nameWithoutExtension: path.basename(imagePath, path.extname(imagePath)),
+              fileType: metadata.format || 'unknown file type'
+            } // You can return other info as needed
+          })
+        )
+        return processedImages // Send back the processed images' info to the renderer
+      } catch (error) {
+        console.error('Error processing images:', error)
+        throw error
+      }
+    }
+  )
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the

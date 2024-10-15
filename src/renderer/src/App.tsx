@@ -5,17 +5,16 @@ import { DropdownMenu, DropdownMenuTrigger } from './components/ui/DropdownMenu'
 import { Block, BlockType, RenameBlock } from './lib/blocks'
 import { useState } from 'react'
 import { NewBlockDropdownMenuContent } from './components/NewBlockDropdownMenuContent'
+import { FileBlock } from './components/FileBlock'
+import { ProcessedImage } from 'src/types'
 
 function App(): JSX.Element {
   const [blocks, setBlocks] = useState<Block[]>([new RenameBlock('1', 'Rename Image')])
-  const [images, setImages] = useState<
-    {
-      path: string
-      filename: string
-    }[]
-  >([])
+  const [images, setImages] = useState<ProcessedImage[]>([])
 
-  // const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
+  const removeImage = (path: string) => {
+    setImages((prevImages) => prevImages.filter((image) => image.path !== path))
+  }
 
   const removeBlock = (id: string) => {
     setBlocks((prevBlocks) => prevBlocks.filter((block) => block.id !== id))
@@ -24,6 +23,33 @@ function App(): JSX.Element {
   const attemptToRenameTest = async (oldPath: string) => {
     const newPath = await window.api.renameFile(oldPath, 'mister')
     console.log(oldPath, newPath)
+  }
+
+  const handleAddImages = async (files: FileList) => {
+    try {
+      // Extract the paths of the files to be added
+      const imagePaths = Array.from(files).map((file) => file.path)
+
+      // Create a Set of the current image paths for efficient lookup
+      const currentImagePaths = new Set(images.map((img) => img.path))
+
+      // Filter out any images that are already in the current state
+      const uniqueImagePaths = imagePaths.filter((path) => !currentImagePaths.has(path))
+
+      // If there are no unique images, exit early
+      if (uniqueImagePaths.length === 0) {
+        console.log('No new images to add.')
+        return
+      }
+
+      // Send only unique paths to the main process for processing
+      const processedImages = await window.api.processImages(uniqueImagePaths)
+
+      // Update state with only the new processed images
+      setImages((prevImages) => [...prevImages, ...processedImages])
+    } catch (error) {
+      console.error('Error adding images:', error)
+    }
   }
 
   const addBlock = (blockType: BlockType) => {
@@ -47,8 +73,6 @@ function App(): JSX.Element {
     }
   }
 
-  console.log(images)
-
   return (
     <div className="font-sans pb-16">
       <div className="p-3 draggable">
@@ -61,15 +85,15 @@ function App(): JSX.Element {
       </div>
 
       <div className="px-3 flex space-x-3">
-        <div className="bg-background w-full h-64 rounded-3xl border-2 border-slate-200 p-3 relative">
+        <div className="bg-background w-full rounded-3xl border-2 border-slate-200 relative max-h-[500px] flex flex-col">
           <div className="absolute top-[calc(100%+6px)] left-1/2 -translate-x-1/2">
             <Curve className="scale-x-[-1] rotate-180" />
           </div>
 
-          {images.length === 0 ? (
-            <div className="w-full h-full bg-indigo-100 border-dashed border-indigo-400 border-[3px] rounded-2xl flex flex-col justify-center space-y-4">
+          <div className="p-3">
+            <div className="w-full h-full bg-indigo-100 border-dashed border-indigo-400 py-7 border-[3px] rounded-2xl flex flex-col justify-center space-y-4">
               <span className="text-indigo-400 font-medium text-center text-sm">
-                Drop files here
+                Drag your files here
               </span>
 
               <div className="flex justify-center">
@@ -87,39 +111,56 @@ function App(): JSX.Element {
                   multiple
                   onChange={(e) => {
                     const files = e.target.files
-                    // if (files) {
-                    //   for (let i = 0; i < files.length; i++) {
-                    //     attemptToRenameTest(files[i].path)
-                    //   }
-                    // }
 
-                    if (files)
-                      setImages((prevImages) => [
-                        ...prevImages,
-                        ...Array.from(files).map((file) => {
-                          return { path: file.path, filename: file.name }
-                        })
-                      ])
+                    if (files) {
+                      handleAddImages(files)
+                    }
                   }}
                 />
               </div>
             </div>
-          ) : (
-            <>
-              {images.map((image) => (
-                <div key={image.path} className="relative w-full h-full bg-blue-600">
-                  <span>{image.filename}</span>
-                  <img
-                    src={'local-file://' + encodeURIComponent(image.path)}
-                    alt="image"
-                    className="w-full h-full object-contain rounded-2xl"
-                  />
+          </div>
+          <div className="border-slate-200 w-full border-b-2 " />
+          {images.length > 0 ? (
+            <div className="flex flex-col px-3 overflow-scroll">
+              {images.map((image, index) => (
+                <div
+                  key={image.path}
+                  className={`border-slate-200 py-2 ${index === images.length - 1 ? '' : 'border-b'}`}
+                >
+                  <FileBlock image={image} />
                 </div>
+                // <div
+                //   key={image.path}
+                //   className="relative w-full  border-b pb-2 flex justify-between items-center"
+                // >
+                //   <div className="flex items-center space-x-3">
+                //     <div className="w-9 h-9 relative">
+                //       <img
+                //         src={'local-file://' + encodeURIComponent(image.path)}
+                //         alt="image"
+                //         className="w-full h-full object-contain"
+                //       />
+                //     </div>
+                //     <span className="text-sm text-secondary-foreground">{image.filename}</span>
+                //   </div>
+                //   <button onClick={() => removeImage(image.path)} className="hover:cursor-pointer">
+                //     <X className="text-muted-foreground/50" size={16} />
+                //   </button>
+                // </div>
               ))}
-            </>
+            </div>
+          ) : (
+            <div className="px-3 py-6 flex justify-center">
+              <span className="text-muted-foreground text-sm font-medium text-center">
+                No files added
+              </span>
+            </div>
           )}
         </div>
-        <div className="bg-background w-full h-64 rounded-3xl border-2 p-3 border-slate-200 relative">
+        <div className="bg-background w-full rounded-3xl border-2 border-slate-200 relative flex items-center justify-center max-h-[500px]">
+          <span className="text-sm text-muted-foreground font-medium">Output files</span>
+
           <div className="absolute top-[calc(100%+4.5px)] left-1/2 -translate-x-1/2">
             <Arrow />
           </div>

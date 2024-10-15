@@ -4,7 +4,8 @@ import { electronAPI } from '@electron-toolkit/preload'
 // Custom APIs for renderer
 const api = {
   renameFile: (oldPath: string, newName: string) =>
-    ipcRenderer.invoke('rename-file', oldPath, newName)
+    ipcRenderer.invoke('rename-file', oldPath, newName),
+  processImages: (images: string[]) => ipcRenderer.invoke('process-images', images)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
