@@ -2,28 +2,57 @@ import { Play, PlusCircle } from 'lucide-react'
 import { Arrow } from './assets/svg/arrow'
 import { Curve } from './assets/svg/curve'
 import { DropdownMenu, DropdownMenuTrigger } from './components/ui/DropdownMenu'
-import { Block, BlockType, RenameBlock } from './lib/blocks'
 import { useState } from 'react'
-import { NewBlockDropdownMenuContent } from './components/NewBlockDropdownMenuContent'
 import { FileBlock } from './components/FileBlock'
 import { ProcessedImage } from 'src/types'
+import { FlowProvider, useFlow } from './context/FlowContext'
+import { ResizeBlock } from './components/blocks/ResizeBlock'
+import { NewBlockDropdownMenuContent } from './components/NewBlockDropdownMenuContent'
+import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Block, BlockSchema } from './lib/schemas'
+
+const FlowSchema = z.object({
+  blocks: z.array(BlockSchema)
+})
+
+type FlowFormValues = z.infer<typeof FlowSchema>
 
 function App(): JSX.Element {
-  const [blocks, setBlocks] = useState<Block[]>([new RenameBlock('1', 'Rename Image')])
+  // const { blocks, imagePaths, updateImages, addBlock } = useFlow()
+
+  // const [blocks, setBlocks] = useState<Block[]>([new RenameBlock('1', 'Rename Image')])
   const [images, setImages] = useState<ProcessedImage[]>([])
 
-  const removeImage = (path: string) => {
-    setImages((prevImages) => prevImages.filter((image) => image.path !== path))
-  }
+  const methods = useForm<FlowFormValues>({
+    resolver: zodResolver(FlowSchema),
+    defaultValues: { blocks: [] }
+  })
 
-  const removeBlock = (id: string) => {
-    setBlocks((prevBlocks) => prevBlocks.filter((block) => block.id !== id))
-  }
+  const { control, handleSubmit } = methods
 
-  const attemptToRenameTest = async (oldPath: string) => {
-    const newPath = await window.api.renameFile(oldPath, 'mister')
-    console.log(oldPath, newPath)
-  }
+  const {
+    fields: blocks,
+    append,
+    remove
+  } = useFieldArray({
+    control,
+    name: 'blocks'
+  })
+
+  // const removeImage = (path: string) => {
+  //   setImages((prevImages) => prevImages.filter((image) => image.path !== path))
+  // }
+
+  // const removeBlock = (id: string) => {
+  //   setBlocks((prevBlocks) => prevBlocks.filter((block) => block.id !== id))
+  // }
+
+  // const attemptToRenameTest = async (oldPath: string) => {
+  //   const newPath = await window.api.renameFile(oldPath, 'mister')
+  //   console.log(oldPath, newPath)
+  // }
 
   const handleAddImages = async (files: FileList) => {
     try {
@@ -52,23 +81,16 @@ function App(): JSX.Element {
     }
   }
 
-  const addBlock = (blockType: BlockType) => {
-    switch (blockType) {
-      case 'rename':
-        setBlocks((prevBlocks) => [
-          ...prevBlocks,
-          new RenameBlock(String(prevBlocks.length + 1), 'Rename Image')
-        ])
-        break
+  const onAddBlock = (type: Block['type']) => {
+    switch (type) {
       case 'resize':
+        append({ type: 'resize', width: 100, height: 100 })
         break
-      case 'convert':
+      case 'rename':
+        append({ type: 'rename', newName: 'new_image_name' })
         break
-      case 'compress':
-        break
-      case 'trim':
-        break
-      default:
+      case 'crop':
+        append({ type: 'crop', top: 0, left: 0, width: 100, height: 100 })
         break
     }
   }
@@ -130,24 +152,6 @@ function App(): JSX.Element {
                 >
                   <FileBlock image={image} />
                 </div>
-                // <div
-                //   key={image.path}
-                //   className="relative w-full  border-b pb-2 flex justify-between items-center"
-                // >
-                //   <div className="flex items-center space-x-3">
-                //     <div className="w-9 h-9 relative">
-                //       <img
-                //         src={'local-file://' + encodeURIComponent(image.path)}
-                //         alt="image"
-                //         className="w-full h-full object-contain"
-                //       />
-                //     </div>
-                //     <span className="text-sm text-secondary-foreground">{image.filename}</span>
-                //   </div>
-                //   <button onClick={() => removeImage(image.path)} className="hover:cursor-pointer">
-                //     <X className="text-muted-foreground/50" size={16} />
-                //   </button>
-                // </div>
               ))}
             </div>
           ) : (
@@ -177,53 +181,73 @@ function App(): JSX.Element {
             <Curve className="scale-x-[-1] absolute top-0 left-[calc(50%-11px)] -translate-x-1/2" />
           </div>
         </div>
-        <div className="mt-10">
-          {blocks.length === 0 && (
-            <div className="flex justify-center text-secondary-foreground">
-              <DropdownMenu>
-                <DropdownMenuTrigger className="bg-background rounded-3xl border-2 border-slate-200 p-3 px-6 self-center flex items-center space-x-3">
-                  <PlusCircle className="" />
-                  <h2 className="font-medium text-sm">Add your first block</h2>
-                </DropdownMenuTrigger>
-                <NewBlockDropdownMenuContent addBlock={addBlock} />
-              </DropdownMenu>
-            </div>
-          )}
 
-          <div className="flex flex-col">
-            {blocks.map((block, index) => (
-              <div key={block.id} className="self-center">
-                <div className="bg-background rounded-3xl border-2 border-slate-200 p-3 relative  min-w-96 ">
-                  <h2 className="font-semibold">{block.title}</h2>
-                  {block.render()}
-                </div>
-                {index < blocks.length - 1 && (
-                  <div className="w-1 h-8 bg-slate-300 mx-auto my-1"></div>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {blocks.length > 0 && (
-            <>
-              <div className="w-1 h-8 bg-slate-300 mx-auto my-1"></div>
+        <FormProvider {...methods}>
+          <div className="mt-10">
+            {blocks.length === 0 && (
               <div className="flex justify-center text-secondary-foreground">
                 <DropdownMenu>
-                  <DropdownMenuTrigger>
-                    <PlusCircle
-                      className="mx-auto text-slate-300 hover:text-indigo-500 hover:cursor-pointer"
-                      strokeWidth={3}
-                    />
+                  <DropdownMenuTrigger className="bg-background rounded-3xl border-2 border-slate-200 p-3 px-6 self-center flex items-center space-x-3">
+                    <PlusCircle className="" />
+                    <h2 className="font-medium text-sm">Add your first block</h2>
                   </DropdownMenuTrigger>
-                  <NewBlockDropdownMenuContent addBlock={addBlock} />
+                  <NewBlockDropdownMenuContent addBlock={onAddBlock} />
                 </DropdownMenu>
               </div>
-            </>
-          )}
-        </div>
+            )}
+
+            <div className="flex flex-col items-center">
+              {blocks.map((block, index) => {
+                let BlockComponent: JSX.Element | null = null
+                switch (block.type) {
+                  case 'resize':
+                    BlockComponent = <ResizeBlock key={block.id} index={index} remove={remove} />
+                    break
+                  // Add cases for other block types
+                  default:
+                    BlockComponent = null
+                }
+
+                return (
+                  <div key={index}>
+                    {BlockComponent}
+                    {index < blocks.length - 1 && (
+                      <div className="w-1 h-8 bg-slate-300 mx-auto my-1"></div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+
+            {blocks.length > 0 && (
+              <>
+                <div className="w-1 h-8 bg-slate-300 mx-auto my-1"></div>
+                <div className="flex justify-center text-secondary-foreground">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger>
+                      <PlusCircle
+                        className="mx-auto text-slate-300 hover:text-indigo-500 hover:cursor-pointer"
+                        strokeWidth={3}
+                      />
+                    </DropdownMenuTrigger>
+                    <NewBlockDropdownMenuContent addBlock={onAddBlock} />
+                  </DropdownMenu>
+                </div>
+              </>
+            )}
+          </div>
+        </FormProvider>
       </div>
     </div>
   )
 }
 
-export default App
+const WrappedApp = () => {
+  return (
+    <FlowProvider>
+      <App />
+    </FlowProvider>
+  )
+}
+
+export default WrappedApp
