@@ -8,7 +8,7 @@ export const ResizeBlockSchema = z.object({
 
 export const RenameBlockSchema = z.object({
   type: z.literal('rename'),
-  newName: z.string().nonempty()
+  newName: z.string().min(1)
 })
 
 export const CropBlockSchema = z.object({

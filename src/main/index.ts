@@ -3,10 +3,10 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import sharp from 'sharp'
-import { ProcessedImage } from '../types'
 
 import * as fs from 'fs'
 import * as path from 'path'
+import { ProcessedImage } from '../types'
 
 function createWindow(): void {
   console.log('CREATING WINDOWS')
@@ -98,13 +98,15 @@ app.whenReady().then(() => {
             const stats = fs.statSync(imagePath)
             const fileSizeInBytes = stats.size
 
-            return {
+            const processedImage: ProcessedImage = {
               path: imagePath,
               size: fileSizeInBytes,
               name: path.basename(imagePath),
-              nameWithoutExtension: path.basename(imagePath, path.extname(imagePath)),
-              fileType: metadata.format || 'unknown file type'
-            } // You can return other info as needed
+              // nameWithoutExtension: path.basename(imagePath, path.extname(imagePath)),
+              fileType: metadata.format || 'unknown file type',
+              status: 'idle'
+            }
+            return processedImage
           })
         )
         return processedImages // Send back the processed images' info to the renderer

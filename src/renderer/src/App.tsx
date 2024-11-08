@@ -5,7 +5,7 @@ import { DropdownMenu, DropdownMenuTrigger } from './components/ui/DropdownMenu'
 import { useState } from 'react'
 import { FileBlock } from './components/FileBlock'
 import { ProcessedImage } from 'src/types'
-import { FlowProvider, useFlow } from './context/FlowContext'
+import { FlowProvider } from './context/FlowContext'
 import { ResizeBlock } from './components/blocks/ResizeBlock'
 import { NewBlockDropdownMenuContent } from './components/NewBlockDropdownMenuContent'
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
@@ -40,19 +40,6 @@ function App(): JSX.Element {
     control,
     name: 'blocks'
   })
-
-  // const removeImage = (path: string) => {
-  //   setImages((prevImages) => prevImages.filter((image) => image.path !== path))
-  // }
-
-  // const removeBlock = (id: string) => {
-  //   setBlocks((prevBlocks) => prevBlocks.filter((block) => block.id !== id))
-  // }
-
-  // const attemptToRenameTest = async (oldPath: string) => {
-  //   const newPath = await window.api.renameFile(oldPath, 'mister')
-  //   console.log(oldPath, newPath)
-  // }
 
   const handleAddImages = async (files: FileList) => {
     try {
@@ -95,11 +82,21 @@ function App(): JSX.Element {
     }
   }
 
+  const onSubmit = handleSubmit((data) => {
+    console.log(images)
+    // Validate and process the images through the flow of blocks
+    console.log('Processing images with the following flow:', data.blocks)
+    // Implement your image processing logic here
+  })
+
   return (
     <div className="font-sans pb-16">
       <div className="p-3 draggable">
         <div className="bg-background h-20 rounded-t-lg rounded-b-3xl border-2 border-slate-200 flex justify-end px-5">
-          <button className="bg-indigo-500 text-white px-5 py-2 rounded-3xl self-center flex items-center space-x-4 no-drag hover:bg-indigo-600">
+          <button
+            className="bg-indigo-500 text-white px-5 py-2 rounded-3xl self-center flex items-center space-x-4 no-drag hover:bg-indigo-600"
+            onClick={onSubmit}
+          >
             <span className="text-sm font-semibold">Run</span>
             <Play size={16} strokeWidth={2} />
           </button>
