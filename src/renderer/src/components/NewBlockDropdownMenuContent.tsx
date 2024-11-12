@@ -1,7 +1,7 @@
 // import { FlipHorizontal, PenLine, Scaling, Scissors, Shrink } from 'lucide-react'
-import { Scaling } from 'lucide-react'
+import { FlipHorizontal, Scaling } from 'lucide-react'
 import { DropdownMenuContent, DropdownMenuItem } from './ui/DropdownMenu'
-import { BlockConfig } from '@renderer/context/FlowContext'
+
 import { Block } from '@renderer/lib/schemas'
 
 export const NewBlockDropdownMenuContent = ({
@@ -13,11 +13,11 @@ export const NewBlockDropdownMenuContent = ({
     <DropdownMenuContent className="w-56">
       {/* <DropdownMenuLabel>My Account</DropdownMenuLabel> */}
       {/* <DropdownMenuSeparator /> */}
-      {/* <DropdownMenuItem onClick={() => addBlock('convert')}>
+      <DropdownMenuItem onClick={() => addBlock('convert')}>
         <FlipHorizontal className="mr-2 h-4 w-4" />
         <span>Convert image type</span>
       </DropdownMenuItem>
-      <DropdownMenuItem onClick={() => addBlock('compress')}>
+      {/* <DropdownMenuItem onClick={() => addBlock('compress')}>
         <Shrink className="mr-2 h-4 w-4" />
         <span>Compress image</span>
       </DropdownMenuItem> */}

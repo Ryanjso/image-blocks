@@ -12,6 +12,7 @@ import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Block, BlockSchema } from './lib/schemas'
+import { ConvertBlock } from './components/blocks/ConvertBlock'
 
 const FlowSchema = z.object({
   blocks: z.array(BlockSchema)
@@ -78,6 +79,9 @@ function App(): JSX.Element {
         break
       case 'crop':
         append({ type: 'crop', top: 0, left: 0, width: 100, height: 100 })
+        break
+      case 'convert':
+        append({ type: 'convert', outputType: 'png' })
         break
     }
   }
@@ -199,6 +203,9 @@ function App(): JSX.Element {
                 switch (block.type) {
                   case 'resize':
                     BlockComponent = <ResizeBlock key={block.id} index={index} remove={remove} />
+                    break
+                  case 'convert':
+                    BlockComponent = <ConvertBlock key={block.id} index={index} remove={remove} />
                     break
                   // Add cases for other block types
                   default:

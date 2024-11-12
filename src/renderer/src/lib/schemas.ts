@@ -19,6 +19,16 @@ export const CropBlockSchema = z.object({
   height: z.number().positive().int()
 })
 
-export const BlockSchema = z.union([ResizeBlockSchema, RenameBlockSchema, CropBlockSchema])
+export const ConvertBlockSchema = z.object({
+  type: z.literal('convert'),
+  outputType: z.enum(['png', 'jpeg', 'webp'])
+})
+
+export const BlockSchema = z.union([
+  ResizeBlockSchema,
+  RenameBlockSchema,
+  CropBlockSchema,
+  ConvertBlockSchema
+])
 
 export type Block = z.infer<typeof BlockSchema>
