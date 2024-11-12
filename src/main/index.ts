@@ -6,8 +6,7 @@ import sharp from 'sharp'
 
 import * as fs from 'fs'
 import * as path from 'path'
-import { ProcessedImage } from '../types'
-
+import { ImageConversionType, ProcessedImage } from '../types'
 function createWindow(): void {
   console.log('CREATING WINDOWS')
 
@@ -112,6 +111,37 @@ app.whenReady().then(() => {
         return processedImages // Send back the processed images' info to the renderer
       } catch (error) {
         console.error('Error processing images:', error)
+        throw error
+      }
+    }
+  )
+
+  // convert image type
+  ipcMain.handle(
+    'convert-image',
+    async (_event, imagePath: string, format: ImageConversionType) => {
+      try {
+        const directory = path.dirname(imagePath)
+        const fileName = path.basename(imagePath, path.extname(imagePath))
+        const newFileName = `${fileName}.${format}`
+        const newPath = path.join(directory, newFileName)
+
+        const output = await sharp(imagePath).toFormat(format).toFile(newPath)
+
+        // dont use sharp size here, its only for specific use cases instead use fs
+        const stats = fs.statSync(newPath)
+        const fileSizeInBytes = stats.size
+
+        const image: Omit<ProcessedImage, 'status'> = {
+          path: newPath,
+          size: fileSizeInBytes,
+          name: newFileName,
+          fileType: output.format || format
+        }
+
+        return image
+      } catch (error) {
+        console.error('Error converting image:', error)
         throw error
       }
     }

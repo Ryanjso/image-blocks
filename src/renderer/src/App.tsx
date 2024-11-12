@@ -86,11 +86,36 @@ function App(): JSX.Element {
     }
   }
 
-  const onSubmit = handleSubmit((data) => {
-    console.log(images)
-    // Validate and process the images through the flow of blocks
-    console.log('Processing images with the following flow:', data.blocks)
-    // Implement your image processing logic here
+  const onSubmit = handleSubmit(async (data) => {
+    for (const block of data.blocks) {
+      for (const image of images) {
+        switch (block.type) {
+          case 'resize':
+            console.log('Resizing image to:', block.width, 'x', block.height)
+            break
+          case 'rename':
+            console.log('Renaming image to:', block.newName)
+            break
+          case 'crop':
+            console.log(
+              'Cropping image to:',
+              block.width,
+              'x',
+              block.height,
+              'at',
+              block.top,
+              block.left
+            )
+            break
+          case 'convert': {
+            console.log('Converting image to:', block.outputType)
+            const output = await window.api.convertImage(image.path, block.outputType)
+            console.log('Converted image:', output)
+            break
+          }
+        }
+      }
+    }
   })
 
   return (

@@ -6,3 +6,5 @@ export interface ProcessedImage {
   status: 'idle' | 'processing' | 'complete' | 'error'
   // eventually have an error message if status is 'error'
 }
+
+export type ImageConversionType = 'jpeg' | 'png' | 'webp'
