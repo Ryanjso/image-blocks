@@ -24,8 +24,6 @@ const ImageSize = ({ sizeInBytes }: { sizeInBytes: number }) => {
 }
 
 export const FileBlock = ({ image }: { image: ProcessedImage }) => {
-  console.log('image', image)
-
   const { path, name: filename } = image
   return (
     <div className="flex justify-between items-center">

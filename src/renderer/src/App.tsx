@@ -13,6 +13,8 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Block, BlockSchema } from './lib/schemas'
 import { ConvertBlock } from './components/blocks/ConvertBlock'
+import { CompressBlock } from './components/blocks/CompressBlock'
+import { TrimBlock } from './components/blocks/TrimBlock'
 
 const FlowSchema = z.object({
   blocks: z.array(BlockSchema)
@@ -21,8 +23,6 @@ const FlowSchema = z.object({
 type FlowFormValues = z.infer<typeof FlowSchema>
 
 function App(): JSX.Element {
-  // const { blocks, imagePaths, updateImages, addBlock } = useFlow()
-
   // const [blocks, setBlocks] = useState<Block[]>([new RenameBlock('1', 'Rename Image')])
   const [images, setImages] = useState<ProcessedImage[]>([])
 
@@ -83,12 +83,28 @@ function App(): JSX.Element {
       case 'convert':
         append({ type: 'convert', outputType: 'png' })
         break
+      case 'compress':
+        append({ type: 'compress', quality: 80 })
+        break
+      case 'trim':
+        append({ type: 'trim' })
+        break
     }
   }
 
   const onSubmit = handleSubmit(async (data) => {
-    for (const block of data.blocks) {
-      for (const image of images) {
+    for (const image of images) {
+      // set image status to processing
+      setImages((prevImages) => {
+        return prevImages.map((img) => {
+          if (img.path === image.path) {
+            return { ...img, status: 'processing' }
+          }
+          return img
+        })
+      })
+
+      for (const block of data.blocks) {
         switch (block.type) {
           case 'resize':
             console.log('Resizing image to:', block.width, 'x', block.height)
@@ -113,15 +129,34 @@ function App(): JSX.Element {
             console.log('Converted image:', output)
             break
           }
+          case 'compress': {
+            console.log('Compressing image to quality:', block.quality)
+            const output = await window.api.compressImage(image.path, block.quality)
+            console.log('Compressed image:', output)
+            break
+          }
+          case 'trim':
+            console.log('Trimming image')
+            break
         }
       }
+
+      // set image status to complete
+      setImages((prevImages) => {
+        return prevImages.map((img) => {
+          if (img.path === image.path) {
+            return { ...img, status: 'complete' }
+          }
+          return img
+        })
+      })
     }
   })
 
   return (
-    <div className="font-sans pb-16">
+    <div className="font-sans pb-16 relative">
       <div className="p-3 draggable">
-        <div className="bg-background h-20 rounded-t-lg rounded-b-3xl border-2 border-slate-200 flex justify-end px-5">
+        <div className="bg-background h-20 rounded-t-lg rounded-b-3xl border-2 border-slate-200 flex justify-end px-5 sticky top-0">
           <button
             className="bg-indigo-500 text-white px-5 py-2 rounded-3xl self-center flex items-center space-x-4 no-drag hover:bg-indigo-600"
             onClick={onSubmit}
@@ -232,7 +267,15 @@ function App(): JSX.Element {
                   case 'convert':
                     BlockComponent = <ConvertBlock key={block.id} index={index} remove={remove} />
                     break
+                  case 'compress':
+                    BlockComponent = <CompressBlock key={block.id} index={index} remove={remove} />
+                    break
+                  case 'trim':
+                    BlockComponent = <TrimBlock key={block.id} index={index} remove={remove} />
+                    break
+
                   // Add cases for other block types
+
                   default:
                     BlockComponent = null
                 }

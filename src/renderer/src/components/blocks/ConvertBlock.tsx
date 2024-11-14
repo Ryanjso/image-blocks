@@ -24,7 +24,7 @@ export const ConvertBlock = ({ remove, index }: ConvertBlockProps) => {
   return (
     <Card className="bg-background  relative w-96 ">
       <CardHeader>
-        <CardTitle>Convert Block</CardTitle>
+        <CardTitle>Convert Image Format</CardTitle>
       </CardHeader>
       <CardContent className="grid gap-4">
         <Label>Output type</Label>

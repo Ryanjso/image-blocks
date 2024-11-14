@@ -11,6 +11,10 @@ declare global {
         imagePath: string,
         format: ImageConversionType
       ) => Promise<{ error?: string } | Omit<ProcessedImage, 'status'>>
+      compressImage: (
+        imagePath: string,
+        quality: number
+      ) => Promise<{ error?: string } | Omit<ProcessedImage, 'status'>>
     }
   }
 }

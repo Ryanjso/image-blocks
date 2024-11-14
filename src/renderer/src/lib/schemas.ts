@@ -24,11 +24,24 @@ export const ConvertBlockSchema = z.object({
   outputType: z.enum(['png', 'jpeg', 'webp'])
 })
 
+export const CompressBlockSchema = z.object({
+  type: z.literal('compress'),
+  quality: z.number().int().min(0).max(100)
+  // maxSize: eventually recursively compress until the image is under this size, optional
+})
+
+export const TrimBlockSchema = z.object({
+  type: z.literal('trim')
+  // threshold: z.number().int().min(0).max(255)
+})
+
 export const BlockSchema = z.union([
   ResizeBlockSchema,
   RenameBlockSchema,
   CropBlockSchema,
-  ConvertBlockSchema
+  ConvertBlockSchema,
+  CompressBlockSchema,
+  TrimBlockSchema
 ])
 
 export type Block = z.infer<typeof BlockSchema>

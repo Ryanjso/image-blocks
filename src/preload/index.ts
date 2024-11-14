@@ -12,7 +12,9 @@ const api = {
     imagePath: string,
     format: ImageConversionType
   ): Promise<Omit<ProcessedImage, 'status'>> =>
-    ipcRenderer.invoke('convert-image', imagePath, format)
+    ipcRenderer.invoke('convert-image', imagePath, format),
+  compressImage: (imagePath: string, quality: number): Promise<Omit<ProcessedImage, 'status'>> =>
+    ipcRenderer.invoke('compress-image', imagePath, quality)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

@@ -147,6 +147,73 @@ app.whenReady().then(() => {
     }
   )
 
+  // compress image
+  ipcMain.handle('compress-image', async (_event, imagePath: string, quality: number) => {
+    try {
+      // check image format, should be jpeg, png or webp, if not throw error
+      // then call the appropriate sharp function to compress the image by reducing the quality
+
+      const image = await sharp(imagePath).metadata()
+      const format = image.format
+
+      switch (format) {
+        case 'jpeg':
+        case 'jpg':
+          await sharp(imagePath).jpeg({ quality }).toFile(imagePath)
+          break
+        case 'png':
+          await sharp(imagePath).png({ quality }).toFile(imagePath)
+          break
+        case 'webp':
+          await sharp(imagePath).webp({ quality }).toFile(imagePath)
+          break
+        default:
+          throw new Error('Unsupported image format')
+      }
+
+      // dont use sharp size here, its only for specific use cases instead use fs
+      const stats = fs.statSync(imagePath)
+      const fileSizeInBytes = stats.size
+
+      const compressedImage: Omit<ProcessedImage, 'status'> = {
+        path: imagePath,
+        size: fileSizeInBytes,
+        name: path.basename(imagePath),
+        fileType: format
+      }
+
+      return compressedImage
+    } catch (error) {
+      console.error('Error compressing image:', error)
+      throw error
+    }
+  })
+
+  // Trim transparent pixels
+  ipcMain.handle('trim-image', async (_event, imagePath: string) => {
+    try {
+      // todo figure out real transparent not top left pixel
+      // https://github.com/lovell/sharp/issues/3608#issuecomment-1501203805
+      const image = await sharp(imagePath).trim().toFile(imagePath) // this currently uses the top left pixel
+
+      // dont use sharp size here, its only for specific use cases instead use fs
+      const stats = fs.statSync(imagePath)
+      const fileSizeInBytes = stats.size
+
+      const trimmedImage: Omit<ProcessedImage, 'status'> = {
+        path: imagePath,
+        size: fileSizeInBytes,
+        name: path.basename(imagePath),
+        fileType: image.format
+      }
+
+      return trimmedImage
+    } catch (error) {
+      console.error('Error trimming image:', error)
+      throw error
+    }
+  })
+
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
