@@ -7,7 +7,7 @@ const api = {
   renameFile: (oldPath: string, newName: string) =>
     ipcRenderer.invoke('rename-file', oldPath, newName),
   processImages: (images: string[]): Promise<ProcessedImage[]> =>
-    ipcRenderer.invoke('process-images', images),
+    ipcRenderer.invoke('get-image-data', images),
   convertImage: (
     imagePath: string,
     format: ImageConversionType
