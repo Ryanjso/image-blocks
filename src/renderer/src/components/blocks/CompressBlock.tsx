@@ -23,7 +23,7 @@ export const CompressBlock = ({ remove, index }: CompressBlockProps) => {
           Compress the image by reducing the quality. A lower quality will result in a smaller file.
         </CardDescription>
       </CardHeader>
-      <CardContent className="grid gap-4">
+      <CardContent className="grid gap-1.5">
         <Label>Quality</Label>
         <Controller
           name={`blocks.${index}.quality`}

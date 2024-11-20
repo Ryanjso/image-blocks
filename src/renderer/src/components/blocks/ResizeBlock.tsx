@@ -20,7 +20,7 @@ export const ResizeBlock = ({ remove, index }: ResizeBlockProps) => {
         <CardTitle>Resize Block</CardTitle>
       </CardHeader>
       <CardContent className="grid gap-4">
-        <div>
+        <div className="grid gap-1.5">
           <Label>Width</Label>
           <Input
             type="number"
@@ -31,7 +31,7 @@ export const ResizeBlock = ({ remove, index }: ResizeBlockProps) => {
           />
           {errors?.blocks?.[index]?.width && <span>{errors.blocks[index].width.message}</span>}
         </div>
-        <div>
+        <div className="grid gap-1.5">
           <Label>Height</Label>
           <Input
             type="number"

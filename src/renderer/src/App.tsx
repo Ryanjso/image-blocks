@@ -15,6 +15,7 @@ import { Block, BlockSchema } from './lib/schemas'
 import { ConvertBlock } from './components/blocks/ConvertBlock'
 import { CompressBlock } from './components/blocks/CompressBlock'
 import { TrimBlock } from './components/blocks/TrimBlock'
+import { RenameBlock } from './components/blocks/RenameBlock'
 
 const FlowSchema = z.object({
   blocks: z.array(BlockSchema)
@@ -75,7 +76,7 @@ function App(): JSX.Element {
         append({ type: 'resize', width: 100, height: 100 })
         break
       case 'rename':
-        append({ type: 'rename', newName: 'new_image_name' })
+        append({ type: 'rename', newName: '' })
         break
       case 'crop':
         append({ type: 'crop', top: 0, left: 0, width: 100, height: 100 })
@@ -273,7 +274,9 @@ function App(): JSX.Element {
                   case 'trim':
                     BlockComponent = <TrimBlock key={block.id} index={index} remove={remove} />
                     break
-
+                  case 'rename':
+                    BlockComponent = <RenameBlock key={block.id} index={index} remove={remove} />
+                    break
                   // Add cases for other block types
 
                   default:

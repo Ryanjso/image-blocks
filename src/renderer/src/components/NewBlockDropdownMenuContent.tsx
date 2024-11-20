@@ -1,5 +1,5 @@
 // import { FlipHorizontal, PenLine, Scaling, Scissors, Shrink } from 'lucide-react'
-import { FlipHorizontal, Scaling, Scissors, Shrink } from 'lucide-react'
+import { FlipHorizontal, PenLine, Scaling, Scissors, Shrink } from 'lucide-react'
 import { DropdownMenuContent, DropdownMenuItem } from './ui/DropdownMenu'
 
 import { Block } from '@renderer/lib/schemas'
@@ -25,10 +25,10 @@ export const NewBlockDropdownMenuContent = ({
         <Scaling className="mr-2 h-4 w-4" />
         <span>Resize image</span>
       </DropdownMenuItem>
-      {/* <DropdownMenuItem onClick={() => addBlock('rename')}>
+      <DropdownMenuItem onClick={() => addBlock('rename')}>
         <PenLine className="mr-2 h-4 w-4" />
         <span>Rename image</span>
-      </DropdownMenuItem> */}
+      </DropdownMenuItem>
       <DropdownMenuItem onClick={() => addBlock('trim')}>
         <Scissors className="mr-2 h-4 w-4" />
         <span>Trim transparent pixels</span>

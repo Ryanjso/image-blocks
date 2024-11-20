@@ -26,7 +26,7 @@ export const ConvertBlock = ({ remove, index }: ConvertBlockProps) => {
       <CardHeader>
         <CardTitle>Convert Image Format</CardTitle>
       </CardHeader>
-      <CardContent className="grid gap-4">
+      <CardContent className="grid gap-1.5">
         <Label>Output type</Label>
         <Controller
           name={`blocks.${index}.outputType`}
