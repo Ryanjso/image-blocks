@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 import { Label } from '../ui/Label'
 import { Input } from '../ui/Input'
 import { FormDescription } from '../ui/Form'
-import { Code, H4, H6, Muted, P } from '../ui/Typography'
+import { Code, P } from '../ui/Typography'
 interface RenameBlockProps {
   index: number
   remove: (index: number) => void
