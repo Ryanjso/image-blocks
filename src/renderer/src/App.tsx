@@ -16,6 +16,7 @@ import { ConvertBlock } from './components/blocks/ConvertBlock'
 import { CompressBlock } from './components/blocks/CompressBlock'
 import { TrimBlock } from './components/blocks/TrimBlock'
 import { RenameBlock } from './components/blocks/RenameBlock'
+import { useImageProcessing } from './hooks/useImageProcessing'
 
 const FlowSchema = z.object({
   blocks: z.array(BlockSchema)
@@ -26,6 +27,16 @@ type FlowFormValues = z.infer<typeof FlowSchema>
 function App(): JSX.Element {
   // const [blocks, setBlocks] = useState<Block[]>([new RenameBlock('1', 'Rename Image')])
   const [images, setImages] = useState<ProcessedImage[]>([])
+
+  const {
+    createTempImage,
+    renameImage,
+    resizeImage,
+    cropImage,
+    convertImage,
+    compressImage,
+    trimImage
+  } = useImageProcessing()
 
   const methods = useForm<FlowFormValues>({
     resolver: zodResolver(FlowSchema),
@@ -93,64 +104,79 @@ function App(): JSX.Element {
     }
   }
 
-  const onSubmit = handleSubmit(async (data) => {
-    for (const image of images) {
-      // set image status to processing
-      setImages((prevImages) => {
-        return prevImages.map((img) => {
-          if (img.path === image.path) {
-            return { ...img, status: 'processing' }
-          }
-          return img
-        })
-      })
+  const updateImageStatus = (
+    imagePath: string,
+    status: ProcessedImage['status']
+    // errorMessage: string | null
+  ) => {
+    setImages((prevImages) =>
+      prevImages.map((img) =>
+        img.path === imagePath
+          ? {
+              ...img,
+              status
+              // errorMessage
+            }
+          : img
+      )
+    )
+  }
 
-      for (const block of data.blocks) {
+  const processImage = async (image: ProcessedImage, blocks: Block[], index: number) => {
+    // set image status to processing
+    updateImageStatus(image.path, 'processing')
+
+    // create a temporary image to make changes to
+    const tempImagePath = await createTempImage(image.path)
+
+    // append '-output' to the image path before the extension
+    let outputImagePathWithoutExtension = image.nameWithoutExtension + '-output'
+
+    try {
+      for (const block of blocks) {
         switch (block.type) {
           case 'resize':
-            console.log('Resizing image to:', block.width, 'x', block.height)
+            await resizeImage(tempImagePath, block.width, block.height)
             break
-          case 'rename':
-            console.log('Renaming image to:', block.newName)
+          case 'rename': {
+            // note were not passing in temp path here
+            const newOutputWithoutExtension = await renameImage(image.path, block.newName, index)
+            outputImagePathWithoutExtension = newOutputWithoutExtension
             break
+          }
           case 'crop':
-            console.log(
-              'Cropping image to:',
-              block.width,
-              'x',
-              block.height,
-              'at',
-              block.top,
-              block.left
-            )
+            await cropImage(tempImagePath, block.left, block.top, block.width, block.height)
             break
           case 'convert': {
-            console.log('Converting image to:', block.outputType)
-            const output = await window.api.convertImage(image.path, block.outputType)
-            console.log('Converted image:', output)
+            await convertImage(tempImagePath, block.outputType)
             break
           }
           case 'compress': {
-            console.log('Compressing image to quality:', block.quality)
-            const output = await window.api.compressImage(image.path, block.quality)
-            console.log('Compressed image:', output)
+            await compressImage(tempImagePath, block.quality)
             break
           }
           case 'trim':
-            console.log('Trimming image')
+            await trimImage(tempImagePath)
             break
         }
       }
 
+      // handle output image path
+
       // set image status to complete
-      setImages((prevImages) => {
-        return prevImages.map((img) => {
-          if (img.path === image.path) {
-            return { ...img, status: 'complete' }
-          }
-          return img
-        })
-      })
+      updateImageStatus(image.path, 'complete')
+    } catch (error) {
+      console.error('Error processing image:', error)
+
+      // set image status to error
+      updateImageStatus(image.path, 'error')
+    }
+  }
+
+  const onSubmit = handleSubmit(async (data) => {
+    for (const [index, image] of images.entries()) {
+      // eventually you can promise.allsettled or something equivalent here maybe with a max concurrency
+      await processImage(image, data.blocks, index)
     }
   })
 

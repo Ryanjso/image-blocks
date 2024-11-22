@@ -34,4 +34,26 @@ export const registerFileHandlers = () => {
 
     return tempPath
   })
+
+  ipcMain.handle('save-temp-file', async (_event, tempFilePath: string, saveFilePath: string) => {
+    try {
+      // Ensure the save directory exists
+      const saveDir = path.dirname(saveFilePath)
+      if (!fs.existsSync(saveDir)) {
+        fs.mkdirSync(saveDir, { recursive: true })
+      }
+
+      // Move the temp file to the save location
+      fs.copyFileSync(tempFilePath, saveFilePath)
+
+      // Delete the temporary file after successful copy
+      fs.unlinkSync(tempFilePath)
+
+      return { success: true }
+    } catch (error) {
+      console.error('Error handling file save:', error)
+      if (error instanceof Error) return { success: false, error: error.message }
+      return { success: false, error: 'An unknown error occurred' }
+    }
+  })
 }

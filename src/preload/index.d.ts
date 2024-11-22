@@ -10,11 +10,16 @@ declare global {
       convertImage: (
         imagePath: string,
         format: ImageConversionType
-      ) => Promise<{ error?: string } | Omit<ProcessedImage, 'status'>>
+      ) => Promise<{ error?: string } | Omit<ProcessedImage, 'status' | 'nameWithoutExtension'>>
       compressImage: (
         imagePath: string,
         quality: number
-      ) => Promise<{ error?: string } | Omit<ProcessedImage, 'status'>>
+      ) => Promise<{ error?: string } | Omit<ProcessedImage, 'status' | 'nameWithoutExtension'>>
+      createTempFile: (imagePath: string) => Promise<string>
+      saveTempFile: (
+        tempFilePath: string,
+        saveFilePath: string
+      ) => Promise<{ error?: string } | { success: boolean }>
     }
   }
 }

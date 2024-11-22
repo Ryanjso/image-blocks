@@ -11,10 +11,16 @@ const api = {
   convertImage: (
     imagePath: string,
     format: ImageConversionType
-  ): Promise<Omit<ProcessedImage, 'status'>> =>
+  ): Promise<Omit<ProcessedImage, 'status' | 'nameWithoutExtension'>> =>
     ipcRenderer.invoke('convert-image', imagePath, format),
-  compressImage: (imagePath: string, quality: number): Promise<Omit<ProcessedImage, 'status'>> =>
-    ipcRenderer.invoke('compress-image', imagePath, quality)
+  compressImage: (
+    imagePath: string,
+    quality: number
+  ): Promise<Omit<ProcessedImage, 'status' | 'nameWithoutExtension'>> =>
+    ipcRenderer.invoke('compress-image', imagePath, quality),
+  creactTempFile: (imagePath: string) => ipcRenderer.invoke('create-temp-file', imagePath),
+  saveTempFile: (tempFilePath: string, saveFilePath: string) =>
+    ipcRenderer.invoke('save-temp-file', tempFilePath, saveFilePath)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

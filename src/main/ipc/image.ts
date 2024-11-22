@@ -23,7 +23,7 @@ export const registerImageHandlers = () => {
               path: imagePath,
               size: fileSizeInBytes,
               name: path.basename(imagePath),
-              // nameWithoutExtension: path.basename(imagePath, path.extname(imagePath)),
+              nameWithoutExtension: path.basename(imagePath, path.extname(imagePath)),
               fileType: metadata.format || 'unknown file type',
               status: 'idle'
             }
@@ -54,7 +54,7 @@ export const registerImageHandlers = () => {
         const stats = fs.statSync(newPath)
         const fileSizeInBytes = stats.size
 
-        const image: Omit<ProcessedImage, 'status'> = {
+        const image: Omit<ProcessedImage, 'status' | 'nameWithoutExtension'> = {
           path: newPath,
           size: fileSizeInBytes,
           name: newFileName,
@@ -97,7 +97,7 @@ export const registerImageHandlers = () => {
       const stats = fs.statSync(imagePath)
       const fileSizeInBytes = stats.size
 
-      const compressedImage: Omit<ProcessedImage, 'status'> = {
+      const compressedImage: Omit<ProcessedImage, 'status' | 'nameWithoutExtension'> = {
         path: imagePath,
         size: fileSizeInBytes,
         name: path.basename(imagePath),
@@ -122,7 +122,7 @@ export const registerImageHandlers = () => {
       const stats = fs.statSync(imagePath)
       const fileSizeInBytes = stats.size
 
-      const trimmedImage: Omit<ProcessedImage, 'status'> = {
+      const trimmedImage: Omit<ProcessedImage, 'status' | 'nameWithoutExtension'> = {
         path: imagePath,
         size: fileSizeInBytes,
         name: path.basename(imagePath),
