@@ -1,11 +1,14 @@
-export interface ProcessedImage {
+export type ProcessedImage =
+  | (BaseImage & { status: 'idle' | 'processing' })
+  | (BaseImage & { status: 'error'; errorMessage: string })
+  | (BaseImage & { status: 'complete'; output: BaseImage })
+
+export interface BaseImage {
   path: string
   name: string
   size: number // File size from sharp
   fileType: string // File type from sharp
-  status: 'idle' | 'processing' | 'complete' | 'error'
   nameWithoutExtension: string
-  // eventually have an error message if status is 'error'
 }
 
 export type ImageConversionType = 'jpeg' | 'png' | 'webp'

@@ -1,10 +1,10 @@
-import { Play, PlusCircle } from 'lucide-react'
+import { Folder, Play, PlusCircle } from 'lucide-react'
 import { Arrow } from './assets/svg/arrow'
 import { Curve } from './assets/svg/curve'
 import { DropdownMenu, DropdownMenuTrigger } from './components/ui/DropdownMenu'
 import { useState } from 'react'
 import { FileBlock } from './components/FileBlock'
-import { ProcessedImage } from 'src/types'
+import { BaseImage, ProcessedImage } from 'src/types'
 import { FlowProvider } from './context/FlowContext'
 import { ResizeBlock } from './components/blocks/ResizeBlock'
 import { NewBlockDropdownMenuContent } from './components/NewBlockDropdownMenuContent'
@@ -17,6 +17,8 @@ import { CompressBlock } from './components/blocks/CompressBlock'
 import { TrimBlock } from './components/blocks/TrimBlock'
 import { RenameBlock } from './components/blocks/RenameBlock'
 import { useImageProcessing } from './hooks/useImageProcessing'
+import { Button, buttonVariants } from './components/ui/Button'
+import { cn } from './lib/utils'
 
 const FlowSchema = z.object({
   blocks: z.array(BlockSchema)
@@ -104,21 +106,31 @@ function App(): JSX.Element {
     }
   }
 
-  const updateImageStatus = (
-    imagePath: string,
-    status: ProcessedImage['status']
-    // errorMessage: string | null
+  const updateImageStatus = <T extends ProcessedImage['status']>(
+    path: string,
+    status: T,
+    additionalData?: T extends 'error'
+      ? { errorMessage: string }
+      : T extends 'complete'
+        ? { output: BaseImage }
+        : undefined
   ) => {
     setImages((prevImages) =>
-      prevImages.map((img) =>
-        img.path === imagePath
-          ? {
-              ...img,
-              status
-              // errorMessage
-            }
-          : img
-      )
+      prevImages.map((image) => {
+        if (image.path === path) {
+          return {
+            ...image,
+            status,
+            ...additionalData
+          } as T extends 'error'
+            ? ProcessedImage & { status: 'error'; errorMessage: string }
+            : T extends 'complete'
+              ? ProcessedImage & { status: 'complete'; output: BaseImage }
+              : ProcessedImage & { status: 'idle' | 'processing' }
+        }
+
+        return image
+      })
     )
   }
 
@@ -194,13 +206,13 @@ function App(): JSX.Element {
         </div>
       </div>
 
-      <div className="px-3 flex space-x-3">
-        <div className="bg-background w-full rounded-3xl border-2 border-slate-200 relative max-h-[500px] flex flex-col">
+      <div className="px-3 flex space-x-3  max-w-5xl mx-auto">
+        <div className="bg-background w-full rounded-3xl border-2 border-slate-200 relative flex flex-col max-w-xl mx-auto">
           <div className="absolute top-[calc(100%+6px)] left-1/2 -translate-x-1/2">
             <Curve className="scale-x-[-1] rotate-180" />
           </div>
 
-          <div className="p-3">
+          <div className="p-3 ">
             <div className="w-full h-full bg-indigo-100 border-dashed border-indigo-400 py-7 border-[3px] rounded-2xl flex flex-col justify-center space-y-4">
               <span className="text-indigo-400 font-medium text-center text-sm">
                 Drag your files here
@@ -209,7 +221,10 @@ function App(): JSX.Element {
               <div className="flex justify-center">
                 <label
                   htmlFor="file-upload"
-                  className="cursor-pointer inline-block px-4 py-2 bg-indigo-500 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-600"
+                  className={cn(
+                    buttonVariants({ variant: 'default', size: 'default' }),
+                    'hover:cursor-pointer'
+                  )}
                 >
                   Browse Files
                 </label>
@@ -231,7 +246,21 @@ function App(): JSX.Element {
             </div>
           </div>
           <div className="border-slate-200 w-full border-b-2 " />
-          {images.length > 0 ? (
+          <div className="p-3">
+            <div className="bg-slate-100 flex justify-between p-4 rounded-xl space-x-8 items-center">
+              <div className="grid gap-1">
+                <p className="text-sm text-slate-500 font-medium">Output Directory:</p>
+                <p className="text-sm text-slate-800 font-semibold break break-all">
+                  /Users/ryanso/Downloads/photos
+                </p>
+              </div>
+              <Button variant={'outline'}>
+                <Folder />
+                Change Directory
+              </Button>
+            </div>
+          </div>
+          {/* {images.length > 0 ? (
             <div className="flex flex-col px-3 overflow-scroll">
               {images.map((image, index) => (
                 <div
@@ -248,15 +277,15 @@ function App(): JSX.Element {
                 No files added
               </span>
             </div>
-          )}
+          )} */}
         </div>
-        <div className="bg-background w-full rounded-3xl border-2 border-slate-200 relative flex items-center justify-center max-h-[500px]">
+        {/* <div className="bg-background w-full rounded-3xl border-2 border-slate-200 relative flex items-center justify-center max-h-[500px]">
           <span className="text-sm text-muted-foreground font-medium">Output files</span>
 
           <div className="absolute top-[calc(100%+4.5px)] left-1/2 -translate-x-1/2">
             <Arrow />
           </div>
-        </div>
+        </div> */}
       </div>
       <div className="px-3 flex flex-col">
         <div className="w-[calc(50%-20px)] mx-auto mt-[42px]  relative ">
