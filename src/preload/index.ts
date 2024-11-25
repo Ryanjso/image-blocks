@@ -20,7 +20,9 @@ const api = {
     ipcRenderer.invoke('compress-image', imagePath, quality),
   creactTempFile: (imagePath: string) => ipcRenderer.invoke('create-temp-file', imagePath),
   saveTempFile: (tempFilePath: string, saveFilePath: string) =>
-    ipcRenderer.invoke('save-temp-file', tempFilePath, saveFilePath)
+    ipcRenderer.invoke('save-temp-file', tempFilePath, saveFilePath),
+  getDefaultDirectory: () => ipcRenderer.invoke('get-default-directory'),
+  selectFolder: () => ipcRenderer.invoke('select-folder')
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

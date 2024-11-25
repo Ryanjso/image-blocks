@@ -27,6 +27,7 @@ type FlowFormValues = z.infer<typeof FlowSchema>
 function App(): JSX.Element {
   // const [blocks, setBlocks] = useState<Block[]>([new RenameBlock('1', 'Rename Image')])
   const [images, setImages] = useState<ProcessedImage[]>([])
+  const [outputDirectory, setOutputDirectory] = useState<string>('')
 
   const {
     createTempImage,
@@ -227,10 +228,19 @@ function App(): JSX.Element {
               <div className="grid gap-1">
                 <p className="text-sm text-slate-500 font-medium">Output Directory:</p>
                 <p className="text-sm text-slate-800 font-semibold break break-all">
-                  /Users/ryanso/Downloads/photos
+                  {outputDirectory}
                 </p>
               </div>
-              <Button variant={'outline'}>
+              <Button
+                variant={'outline'}
+                onClick={async () => {
+                  const path = await window.api.selectFolder()
+                  console.log(path)
+                  if (path) {
+                    setOutputDirectory(path)
+                  }
+                }}
+              >
                 <Folder />
                 Change Directory
               </Button>

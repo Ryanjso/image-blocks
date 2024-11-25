@@ -20,6 +20,8 @@ declare global {
         tempFilePath: string,
         saveFilePath: string
       ) => Promise<{ error?: string } | { success: boolean }>
+      getDefaultDirectory: () => Promise<string>
+      selectFolder: () => Promise<string | null>
     }
   }
 }
