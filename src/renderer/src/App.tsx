@@ -1,10 +1,8 @@
 import { Folder, Play, PlusCircle } from 'lucide-react'
-import { Arrow } from './assets/svg/arrow'
 import { Curve } from './assets/svg/curve'
 import { DropdownMenu, DropdownMenuTrigger } from './components/ui/DropdownMenu'
 import { useState } from 'react'
-import { FileBlock } from './components/FileBlock'
-import { BaseImage, ProcessedImage } from 'src/types'
+import { ProcessedImage, ProcessedImagePayload } from 'src/types'
 import { FlowProvider } from './context/FlowContext'
 import { ResizeBlock } from './components/blocks/ResizeBlock'
 import { NewBlockDropdownMenuContent } from './components/NewBlockDropdownMenuContent'
@@ -106,37 +104,15 @@ function App(): JSX.Element {
     }
   }
 
-  const updateImageStatus = <T extends ProcessedImage['status']>(
-    path: string,
-    status: T,
-    additionalData?: T extends 'error'
-      ? { errorMessage: string }
-      : T extends 'complete'
-        ? { output: BaseImage }
-        : undefined
-  ) => {
+  const updateImageStatus = (path: string, update: ProcessedImagePayload) => {
     setImages((prevImages) =>
-      prevImages.map((image) => {
-        if (image.path === path) {
-          return {
-            ...image,
-            status,
-            ...additionalData
-          } as T extends 'error'
-            ? ProcessedImage & { status: 'error'; errorMessage: string }
-            : T extends 'complete'
-              ? ProcessedImage & { status: 'complete'; output: BaseImage }
-              : ProcessedImage & { status: 'idle' | 'processing' }
-        }
-
-        return image
-      })
+      prevImages.map((image) => (image.path === path ? { ...image, ...update } : image))
     )
   }
 
   const processImage = async (image: ProcessedImage, blocks: Block[], index: number) => {
     // set image status to processing
-    updateImageStatus(image.path, 'processing')
+    updateImageStatus(image.path, { status: 'processing' })
 
     // create a temporary image to make changes to
     const tempImagePath = await createTempImage(image.path)
@@ -176,7 +152,7 @@ function App(): JSX.Element {
       // handle output image path
 
       // set image status to complete
-      updateImageStatus(image.path, 'complete')
+      updateImageStatus(image.path, { status: 'complete' })
     } catch (error) {
       console.error('Error processing image:', error)
 
