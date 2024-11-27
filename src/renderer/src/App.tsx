@@ -1,7 +1,7 @@
 import { Folder, Play, PlusCircle } from 'lucide-react'
 import { Curve } from './assets/svg/curve'
 import { DropdownMenu, DropdownMenuTrigger } from './components/ui/DropdownMenu'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ProcessedImage, ProcessedImagePayload } from 'src/types'
 import { FlowProvider } from './context/FlowContext'
 import { ResizeBlock } from './components/blocks/ResizeBlock'
@@ -17,6 +17,7 @@ import { RenameBlock } from './components/blocks/RenameBlock'
 import { useImageProcessing } from './hooks/useImageProcessing'
 import { Button, buttonVariants } from './components/ui/Button'
 import { cn } from './lib/utils'
+import { FileBlock } from './components/FileBlock'
 
 const FlowSchema = z.object({
   blocks: z.array(BlockSchema)
@@ -55,6 +56,19 @@ function App(): JSX.Element {
     name: 'blocks'
   })
 
+  useEffect(() => {
+    const fetchDefaultDirectory = async () => {
+      try {
+        const defaultDirectory = await window.api.getDefaultDirectory()
+        setOutputDirectory(defaultDirectory)
+      } catch (error) {
+        console.error('Error fetching default directory:', error)
+      }
+    }
+
+    fetchDefaultDirectory()
+  }, [])
+
   const handleAddImages = async (files: FileList) => {
     try {
       // Extract the paths of the files to be added
@@ -80,6 +94,10 @@ function App(): JSX.Element {
     } catch (error) {
       console.error('Error adding images:', error)
     }
+  }
+
+  const handleRemoveImage = (path: string) => {
+    setImages((prevImages) => prevImages.filter((img) => img.path !== path))
   }
 
   const onAddBlock = (type: Block['type']) => {
@@ -246,6 +264,7 @@ function App(): JSX.Element {
               </Button>
             </div>
           </div>
+
           {/* {images.length > 0 ? (
             <div className="flex flex-col px-3 overflow-scroll">
               {images.map((image, index) => (
@@ -273,6 +292,12 @@ function App(): JSX.Element {
           </div>
         </div> */}
       </div>
+      <div className="grid gap-2 w-full mt-12 px-3 max-w-[900px] mx-auto">
+        {images.map((image, index) => (
+          <FileBlock key={image.path} image={image} remove={handleRemoveImage} />
+        ))}
+      </div>
+
       <div className="px-3 flex flex-col">
         <div className="w-[calc(50%-20px)] mx-auto mt-[42px]  relative ">
           <div className="w-full relative flex space-x-12">

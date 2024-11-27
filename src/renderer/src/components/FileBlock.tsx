@@ -1,3 +1,4 @@
+import { ArrowRight, X } from 'lucide-react'
 import { ProcessedImage } from 'src/types'
 
 const ImageSize = ({ sizeInBytes }: { sizeInBytes: number }) => {
@@ -23,28 +24,48 @@ const ImageSize = ({ sizeInBytes }: { sizeInBytes: number }) => {
   return <span className="">{formatSize(sizeInBytes)}</span>
 }
 
-export const FileBlock = ({ image }: { image: ProcessedImage }) => {
-  const { path, name: filename } = image
+export const FileBlock = ({
+  image,
+  remove
+}: {
+  image: ProcessedImage
+  remove: (imagePath: string) => void
+}) => {
+  const { path, nameWithoutExtension, fileType } = image
   return (
-    <div className="flex justify-between items-center">
-      <div className="flex items-center space-x-2">
-        <div className="w-9 h-9 relative rounded-sm overflow-hidden">
+    <div key={image.path} className="flex gap-2 justify-between w-full relative">
+      <div className="w-7 h-7 border-white border-2 rounded-sm bg-indigo-100 absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex items-center justify-center z-10">
+        <ArrowRight className="text-primary" size={18} strokeWidth="2" />
+      </div>
+      <div className="bg-white border-2 border-slate-200 rounded-lg w-full p-2 flex gap-3 items-center">
+        <div className="rounded-md h-14 w-14 overflow-hidden">
           <img
             src={'local-file://' + encodeURIComponent(path)}
             alt="image"
-            className="w-full h-full object-contain"
+            className="w-full h-full object-cover rounded-md"
           />
         </div>
-        <div className="flex flex-col">
-          <span className="text-sm text-secondary-foreground font-medium">{filename}</span>
-          <div className="text-sm text-muted-foreground flex">
-            <ImageSize sizeInBytes={image.size} />
-            <div className="border-r h-3 inline mx-1 mt-1" />
-            <span className="lowercase">{image.fileType}</span>
+
+        <div>
+          <div className="text-slate-800 font-medium">{nameWithoutExtension}</div>
+          <div className="text-slate-500 text-sm flex gap-1.5 items-center">
+            <span>
+              <ImageSize sizeInBytes={image.size} />
+            </span>
+            <div className="border-l h-2.5 border-slate-200" />
+            <span>{fileType}</span>
           </div>
         </div>
       </div>
-      <div>{image.status}</div>
+      <div className="bg-white border-2 border-slate-200 rounded-lg w-full flex justify-between items-center p-2 relative">
+        <button
+          onClick={() => remove(path)}
+          className="rounded-sm border-2 border-slate-200 absolute bg-white -top-2 -right-2"
+        >
+          <X className="text-slate-500" size={14} />
+        </button>
+        <span className=" text-sm text-slate-500 px-4">Press run to begin processing</span>
+      </div>
     </div>
   )
 }
