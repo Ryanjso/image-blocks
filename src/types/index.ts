@@ -1,7 +1,8 @@
 export type ProcessedImageError = { status: 'error'; errorMessage: string }
 export type ProcessedImageIdle = { status: 'idle' }
 export type ProcessedImageProcessing = { status: 'processing' }
-export type ProcessedImageComplete = { status: 'complete'; output: BaseImage }
+export type ProcessedImageComplete = { status: 'success'; output: BaseImage }
+// eventually add a queued status so we don't have to show all as processing even when they arent
 
 export type ProcessedImagePayload =
   | ProcessedImageIdle

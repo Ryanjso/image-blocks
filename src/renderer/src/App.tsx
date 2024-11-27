@@ -18,6 +18,7 @@ import { useImageProcessing } from './hooks/useImageProcessing'
 import { Button, buttonVariants } from './components/ui/Button'
 import { cn } from './lib/utils'
 import { FileBlock } from './components/FileBlock'
+import { Arrow } from './assets/svg/arrow'
 
 const FlowSchema = z.object({
   blocks: z.array(BlockSchema)
@@ -130,9 +131,6 @@ function App(): JSX.Element {
   }
 
   const processImage = async (image: ProcessedImage, blocks: Block[], index: number) => {
-    // set image status to processing
-    updateImageStatus(image.path, { status: 'processing' })
-
     // create a temporary image to make changes to
     const tempImagePath = await createTempImage(image.path)
 
@@ -171,7 +169,7 @@ function App(): JSX.Element {
       // handle output image path
 
       // set image status to complete
-      updateImageStatus(image.path, { status: 'complete' })
+      updateImageStatus(image.path, { status: 'success' })
     } catch (error) {
       console.error('Error processing image:', error)
 
@@ -181,6 +179,9 @@ function App(): JSX.Element {
   }
 
   const onSubmit = handleSubmit(async (data) => {
+    // mark all images as processing
+    setImages((prevImages) => prevImages.map((image) => ({ ...image, status: 'processing' })))
+
     for (const [index, image] of images.entries()) {
       // eventually you can promise.allsettled or something equivalent here maybe with a max concurrency
       await processImage(image, data.blocks, index)
@@ -189,24 +190,24 @@ function App(): JSX.Element {
 
   return (
     <div className="font-sans pb-16 relative">
-      <div className="p-3 draggable">
-        <div className="bg-background h-20 rounded-t-lg rounded-b-3xl border-2 border-slate-200 flex justify-end px-5 sticky top-0">
-          <button
+      <div className="p-3 draggable sticky top-0 z-10">
+        <div className="bg-background py-2 rounded-lg border-2 border-slate-200 flex justify-end px-2 sticky top-0">
+          {/* <button
             className="bg-indigo-500 text-white px-5 py-2 rounded-3xl self-center flex items-center space-x-4 no-drag hover:bg-indigo-600"
             onClick={onSubmit}
           >
             <span className="text-sm font-semibold">Run</span>
             <Play size={16} strokeWidth={2} />
-          </button>
+          </button> */}
+          <Button onClick={onSubmit} className="no-drag">
+            <Play size={16} strokeWidth={2} />
+            Run
+          </Button>
         </div>
       </div>
 
       <div className="px-3 flex space-x-3  max-w-5xl mx-auto">
         <div className="bg-background w-full rounded-3xl border-2 border-slate-200 relative flex flex-col max-w-xl mx-auto">
-          <div className="absolute top-[calc(100%+6px)] left-1/2 -translate-x-1/2">
-            <Curve className="scale-x-[-1] rotate-180" />
-          </div>
-
           <div className="p-3 ">
             <div className="w-full h-full bg-indigo-100 border-dashed border-indigo-400 py-7 border-[3px] rounded-2xl flex flex-col justify-center space-y-4">
               <span className="text-indigo-400 font-medium text-center text-sm">
@@ -264,42 +265,25 @@ function App(): JSX.Element {
               </Button>
             </div>
           </div>
-
-          {/* {images.length > 0 ? (
-            <div className="flex flex-col px-3 overflow-scroll">
-              {images.map((image, index) => (
-                <div
-                  key={image.path}
-                  className={`border-slate-200 py-2 ${index === images.length - 1 ? '' : 'border-b'}`}
-                >
-                  <FileBlock image={image} />
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="px-3 py-6 flex justify-center">
-              <span className="text-muted-foreground text-sm font-medium text-center">
-                No files added
-              </span>
-            </div>
-          )} */}
         </div>
-        {/* <div className="bg-background w-full rounded-3xl border-2 border-slate-200 relative flex items-center justify-center max-h-[500px]">
-          <span className="text-sm text-muted-foreground font-medium">Output files</span>
-
-          <div className="absolute top-[calc(100%+4.5px)] left-1/2 -translate-x-1/2">
-            <Arrow />
-          </div>
-        </div> */}
       </div>
       <div className="grid gap-2 w-full mt-12 px-3 max-w-[900px] mx-auto">
         {images.map((image, index) => (
           <FileBlock key={image.path} image={image} remove={handleRemoveImage} />
         ))}
       </div>
+      {/* <div className="bg-background w-full rounded-3xl border-2 border-slate-200 relative flex items-center justify-center max-h-[500px]">
+        <div className="absolute top-[calc(100%+6px)] left-1/2 -translate-x-1/2">
+          <Curve className="scale-x-[-1] rotate-180" />
+        </div>
+
+        <div className="absolute top-[calc(100%+4.5px)] left-1/2 -translate-x-1/2">
+          <Arrow />
+        </div>
+      </div> */}
 
       <div className="px-3 flex flex-col">
-        <div className="w-[calc(50%-20px)] mx-auto mt-[42px]  relative ">
+        {/* <div className="w-[calc(50%-20px)] mx-auto mt-[42px]  relative ">
           <div className="w-full relative flex space-x-12">
             <hr className="border-slate-300 border-[2px] w-full" />
             <hr className="border-slate-300 border-[2px] w-full" />
@@ -308,7 +292,7 @@ function App(): JSX.Element {
             <Curve className="absolute left-[calc(50%+11px)] -translate-x-1/2" />
             <Curve className="scale-x-[-1] absolute top-0 left-[calc(50%-11px)] -translate-x-1/2" />
           </div>
-        </div>
+        </div> */}
 
         <FormProvider {...methods}>
           <div className="mt-10">
