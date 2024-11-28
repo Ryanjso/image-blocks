@@ -6,7 +6,8 @@
     "src/renderer/src/**/*",
     "src/renderer/src/**/*.tsx",
     "src/preload/*.d.ts"
-, "src/main/libs/images.tsx"  ],
+, "src/main/libs/images.tsx"
+, "src/main/index.ts"  ],
   "compilerOptions": {
     "composite": true,
     "jsx": "react-jsx",

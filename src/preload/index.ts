@@ -1,6 +1,8 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import { ImageConversionType, ProcessedImage } from '../types'
+import { exposeElectronTRPC } from 'electron-trpc/main'
+// import { exposeElectronTRPC } from 'electron-trpc'
 
 // Custom APIs for renderer
 const api = {
@@ -41,3 +43,7 @@ if (process.contextIsolated) {
   // @ts-ignore (define in dts)
   window.api = api
 }
+
+process.once('loaded', async () => {
+  exposeElectronTRPC()
+})

@@ -3,8 +3,28 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { registerHandlers } from './ipc'
+import { z } from 'zod'
+import { createIPCHandler } from 'electron-trpc/main'
 
-function createWindow(): void {
+import { initTRPC } from '@trpc/server'
+
+const t = initTRPC.create({ isServer: true })
+
+export const router = t.router({
+  greeting: t.procedure.input(z.object({ name: z.string() })).query((req) => {
+    const { input } = req
+
+    // ee.emit('greeting', `Greeted ${input.name}`);
+    return {
+      text: `Hello ${input.name}`,
+      super: 2
+    }
+  })
+})
+
+export type AppRouter = typeof router
+
+function createWindow(): BrowserWindow {
   console.log('CREATING WINDOWS')
 
   // Create the browser window.
@@ -39,6 +59,8 @@ function createWindow(): void {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
+
+  return mainWindow
 }
 
 // This method will be called when Electron has finished
@@ -64,7 +86,9 @@ app.whenReady().then(() => {
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
 
-  createWindow()
+  const win = createWindow()
+
+  createIPCHandler({ router, windows: [win] })
 
   registerHandlers() // Register IPC handlers
 

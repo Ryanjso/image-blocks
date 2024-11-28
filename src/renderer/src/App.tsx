@@ -1,5 +1,5 @@
 import { Folder, Play, PlusCircle } from 'lucide-react'
-import { Curve } from './assets/svg/curve'
+// import { Curve } from './assets/svg/curve'
 import { DropdownMenu, DropdownMenuTrigger } from './components/ui/DropdownMenu'
 import { useEffect, useState } from 'react'
 import { ProcessedImage, ProcessedImagePayload } from 'src/types'
@@ -18,7 +18,11 @@ import { useImageProcessing } from './hooks/useImageProcessing'
 import { Button, buttonVariants } from './components/ui/Button'
 import { cn } from './lib/utils'
 import { FileBlock } from './components/FileBlock'
-import { Arrow } from './assets/svg/arrow'
+// import { Arrow } from './assets/svg/arrow'
+import { ipcLink } from 'electron-trpc/renderer'
+import { createTRPCReact } from '@trpc/react-query'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { AppRouter } from '../../main/index'
 
 const FlowSchema = z.object({
   blocks: z.array(BlockSchema)
@@ -26,7 +30,28 @@ const FlowSchema = z.object({
 
 type FlowFormValues = z.infer<typeof FlowSchema>
 
+const trpcReact = createTRPCReact<AppRouter>()
+
 function App(): JSX.Element {
+  const [queryClient] = useState(() => new QueryClient())
+  const [trpcClient] = useState(() =>
+    trpcReact.createClient({
+      links: [ipcLink()]
+    })
+  )
+
+  return (
+    <trpcReact.Provider client={trpcClient} queryClient={queryClient}>
+      <QueryClientProvider client={queryClient}>
+        <Main />
+      </QueryClientProvider>
+    </trpcReact.Provider>
+  )
+}
+
+const Main = () => {
+  const { data } = trpcReact.greeting.useQuery({ name: 'world' })
+  console.log(data)
   // const [blocks, setBlocks] = useState<Block[]>([new RenameBlock('1', 'Rename Image')])
   const [images, setImages] = useState<ProcessedImage[]>([])
   const [outputDirectory, setOutputDirectory] = useState<string>('')
