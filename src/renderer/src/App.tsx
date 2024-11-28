@@ -51,8 +51,7 @@ function App(): JSX.Element {
 
 const Main = () => {
   const { data } = trpcReact.greeting.useQuery({ name: 'world' })
-  console.log(data)
-  // const [blocks, setBlocks] = useState<Block[]>([new RenameBlock('1', 'Rename Image')])
+
   const [images, setImages] = useState<ProcessedImage[]>([])
   const [outputDirectory, setOutputDirectory] = useState<string>('')
 

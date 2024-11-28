@@ -2,31 +2,10 @@ import { app, shell, BrowserWindow, ipcMain, protocol, net } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { registerHandlers } from './ipc'
-import { z } from 'zod'
 import { createIPCHandler } from 'electron-trpc/main'
-
-import { initTRPC } from '@trpc/server'
-
-const t = initTRPC.create({ isServer: true })
-
-export const router = t.router({
-  greeting: t.procedure.input(z.object({ name: z.string() })).query((req) => {
-    const { input } = req
-
-    // ee.emit('greeting', `Greeted ${input.name}`);
-    return {
-      text: `Hello ${input.name}`,
-      super: 2
-    }
-  })
-})
-
-export type AppRouter = typeof router
+import { api } from './ipc/api'
 
 function createWindow(): BrowserWindow {
-  console.log('CREATING WINDOWS')
-
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 1080,
@@ -88,9 +67,9 @@ app.whenReady().then(() => {
 
   const win = createWindow()
 
-  createIPCHandler({ router, windows: [win] })
+  createIPCHandler({ router: api, windows: [win] })
 
-  registerHandlers() // Register IPC handlers
+  // registerHandlers() // Register IPC handlers
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
