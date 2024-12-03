@@ -4,6 +4,7 @@ import { Label } from '../ui/Label'
 import { Input } from '../ui/Input'
 import { FormDescription } from '../ui/Form'
 import { Code, P } from '../ui/Typography'
+import { RemoveBlock } from '../RemoveBlock'
 interface RenameBlockProps {
   index: number
   remove: (index: number) => void
@@ -17,6 +18,7 @@ export const RenameBlock = ({ remove, index }: RenameBlockProps) => {
 
   return (
     <Card className="bg-background  relative w-96 ">
+      <RemoveBlock onClick={() => remove(index)} />
       <CardHeader>
         <CardTitle>Rename File</CardTitle>
         <CardDescription>
@@ -78,7 +80,6 @@ export const RenameBlock = ({ remove, index }: RenameBlockProps) => {
           </FormDescription>
         </div>
       </CardContent>
-      {/* <button onClick={() => remove(index)}>Remove</button> */}
     </Card>
   )
 }

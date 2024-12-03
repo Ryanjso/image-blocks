@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '../ui/Select'
+import { RemoveBlock } from '../RemoveBlock'
 
 interface ConvertBlockProps {
   index: number
@@ -23,6 +24,7 @@ export const ConvertBlock = ({ remove, index }: ConvertBlockProps) => {
 
   return (
     <Card className="bg-background  relative w-96 ">
+      <RemoveBlock onClick={() => remove(index)} />
       <CardHeader>
         <CardTitle>Convert Image Format</CardTitle>
       </CardHeader>
@@ -53,7 +55,6 @@ export const ConvertBlock = ({ remove, index }: ConvertBlockProps) => {
         />
         <div></div>
       </CardContent>
-      {/* <button onClick={() => remove(index)}>Remove</button> */}
     </Card>
   )
 }

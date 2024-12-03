@@ -2,6 +2,7 @@ import { useFormContext } from 'react-hook-form'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card'
 import { Input } from '../ui/Input'
 import { Label } from '../ui/Label'
+import { RemoveBlock } from '../RemoveBlock'
 
 interface ResizeBlockProps {
   index: number
@@ -16,6 +17,7 @@ export const ResizeBlock = ({ remove, index }: ResizeBlockProps) => {
 
   return (
     <Card className="bg-background  relative w-96 ">
+      <RemoveBlock onClick={() => remove(index)} />
       <CardHeader>
         <CardTitle>Resize Block</CardTitle>
       </CardHeader>
@@ -43,7 +45,6 @@ export const ResizeBlock = ({ remove, index }: ResizeBlockProps) => {
           {errors?.blocks?.[index]?.height && <span>{errors.blocks[index].height.message}</span>}
         </div>
       </CardContent>
-      {/* <button onClick={() => remove(index)}>Remove</button> */}
     </Card>
   )
 }

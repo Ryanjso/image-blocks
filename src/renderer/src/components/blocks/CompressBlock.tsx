@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 import { Label } from '../ui/Label'
 import { Slider } from '../ui/Slider'
 import { Input } from '../ui/Input'
+import { RemoveBlock } from '../RemoveBlock'
 
 interface CompressBlockProps {
   index: number
@@ -17,6 +18,7 @@ export const CompressBlock = ({ remove, index }: CompressBlockProps) => {
 
   return (
     <Card className="bg-background  relative w-96 ">
+      <RemoveBlock onClick={() => remove(index)} />
       <CardHeader>
         <CardTitle>Compress Image</CardTitle>
         <CardDescription>
@@ -55,7 +57,6 @@ export const CompressBlock = ({ remove, index }: CompressBlockProps) => {
           )}
         />
       </CardContent>
-      {/* <button onClick={() => remove(index)}>Remove</button> */}
     </Card>
   )
 }

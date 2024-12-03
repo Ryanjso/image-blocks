@@ -23,18 +23,22 @@ export const replaceVariables = (input: string, variables: Record<string, string
 }
 
 export const getUniqueImages = (prevImages: ProcessedImage[], newImages: ProcessedImage[]) => {
-  const uniqueImages = new Map<string, ProcessedImage>()
+  const seenPaths = new Set<string>()
 
-  // Add previous images to the map, using their path as the key
-  for (const image of prevImages) {
-    uniqueImages.set(image.path, image)
+  // Helper function to filter unique images
+  const filterUnique = (images: ProcessedImage[]) => {
+    return images.filter((image) => {
+      if (seenPaths.has(image.path)) {
+        return false
+      }
+      seenPaths.add(image.path)
+      return true
+    })
   }
 
-  // Add new images to the map, overriding duplicates
-  for (const image of newImages) {
-    uniqueImages.set(image.path, image)
-  }
+  const uniqueNewImages = filterUnique(newImages)
+  const uniquePrevImages = filterUnique(prevImages)
 
-  // Convert the map values back to an array
-  return Array.from(uniqueImages.values())
+  // Combine new images first, followed by previous images
+  return [...uniqueNewImages, ...uniquePrevImages]
 }

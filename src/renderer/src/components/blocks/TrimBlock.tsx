@@ -1,4 +1,5 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/Card'
+import { RemoveBlock } from '../RemoveBlock'
+import { Card, CardDescription, CardHeader, CardTitle } from '../ui/Card'
 
 interface ResizeBlockProps {
   index: number
@@ -8,11 +9,11 @@ interface ResizeBlockProps {
 export const TrimBlock = ({ remove, index }: ResizeBlockProps) => {
   return (
     <Card className="bg-background  relative w-96 ">
+      <RemoveBlock onClick={() => remove(index)} />
       <CardHeader>
         <CardTitle>Trim Block</CardTitle>
         <CardDescription>Trim transparent pixels from the image</CardDescription>
       </CardHeader>
-      {/* <button onClick={() => remove(index)}>Remove</button> */}
     </Card>
   )
 }
