@@ -62,10 +62,12 @@ const ImageInfo = ({
 
 export const FileBlock = ({
   image,
-  remove
+  remove,
+  onRunClick
 }: {
   image: ImageWithStatus
   remove: (imagePath: string) => void
+  onRunClick: () => void
 }) => {
   const { mutate: openImageInFileManager } = useOpenFileManagerToPath()
 
@@ -123,7 +125,7 @@ export const FileBlock = ({
           // Idle state
           <div className="pl-4 pr-2 flex justify-between items-center h-full">
             <span className=" text-sm text-slate-500">Press run to begin processing</span>
-            <Button size={'icon'} variant={'ghost'}>
+            <Button size={'icon'} variant={'ghost'} onClick={() => onRunClick(path)}>
               <Play className="text-primary" size={16} strokeWidth="2" />
             </Button>
           </div>

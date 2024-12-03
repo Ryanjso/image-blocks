@@ -1,13 +1,13 @@
 import * as path from 'path'
-
 import sharp from 'sharp'
 import { procedure, router } from './trpc'
 import { z } from 'zod'
 import { getImageData } from '../helpers/system.helpers'
+import { TRPCError } from '@trpc/server'
 
 export const imageRouter = router({
   convert: procedure
-    .input(z.object({ imagePath: z.string(), format: z.string() }))
+    .input(z.object({ imagePath: z.string(), format: z.enum(['jpeg', 'png', 'webp', 'jpg']) }))
     .mutation(async ({ input }) => {
       const { imagePath, format } = input
 
@@ -24,7 +24,10 @@ export const imageRouter = router({
         return image
       } catch (error) {
         console.error('Error converting image:', error)
-        throw error
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Error converting image'
+        })
       }
     }),
   compress: procedure

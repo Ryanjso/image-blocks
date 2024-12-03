@@ -16,6 +16,7 @@ import { TrimBlock } from './components/blocks/TrimBlock'
 import { RenameBlock } from './components/blocks/RenameBlock'
 import { useImageProcessing } from './hooks/useImageProcessing'
 import { Button } from './components/ui/Button'
+import { TRPCClientError } from '@trpc/client'
 
 import { FileBlock } from './components/FileBlock'
 // import { Arrow } from './assets/svg/arrow'
@@ -219,30 +220,46 @@ const Main = () => {
       console.error('Error processing image:', error)
 
       // set image status to error
-      updateImageStatus(image.path, { status: 'error', errorMessage: error.message })
+      let errorMessage = 'An error occurred while processing this image'
+      if (error instanceof TRPCClientError) {
+        errorMessage = error['message']
+      } else if (error instanceof Error) {
+        errorMessage = error.message
+      }
+
+      updateImageStatus(image.path, { status: 'error', errorMessage })
     }
   }
 
-  const onSubmit = handleSubmit(async (data) => {
-    // mark all images as processing
+  const onSubmit = async (data: FlowFormValues, imageIndex?: number) => {
+    // Mark the images as processing based on imageIndex
     setImages((prevImages) =>
-      prevImages.map((image) => ({
-        ...image,
-        status: 'processing'
-      }))
+      prevImages.map((image, index) =>
+        imageIndex === undefined || index === imageIndex
+          ? { ...image, status: 'processing' }
+          : image
+      )
     )
 
-    for (const [index, image] of images.entries()) {
-      // eventually you can promise.allsettled or something equivalent here maybe with a max concurrency
-      await processImage(image, data.blocks, index)
+    if (imageIndex !== undefined) {
+      // Process only the specific image
+      const image = images[imageIndex]
+      if (image) {
+        await processImage(image, data.blocks, imageIndex)
+      }
+    } else {
+      // Process all images
+      for (const [index, image] of images.entries()) {
+        await processImage(image, data.blocks, index)
+      }
     }
-  })
+  }
 
   return (
     <div className="font-sans pb-16 relative">
       <div className="p-3 draggable sticky top-0 z-10">
         <div className="bg-background py-2 rounded-lg border-2 border-slate-200 flex justify-end px-2 sticky top-0">
-          <Button onClick={onSubmit} className="no-drag">
+          <Button onClick={handleSubmit((data) => onSubmit(data))} className="no-drag">
             <Play size={16} strokeWidth={2} />
             Run
           </Button>
@@ -264,8 +281,13 @@ const Main = () => {
         </div>
       </div>
       <div className="grid gap-2 w-full mt-12 px-3 max-w-[900px] mx-auto">
-        {images.map((image) => (
-          <FileBlock key={image.path} image={image} remove={handleRemoveImage} />
+        {images.map((image, index) => (
+          <FileBlock
+            key={image.path}
+            image={image}
+            remove={handleRemoveImage}
+            onRunClick={handleSubmit((data) => onSubmit(data, index))}
+          />
         ))}
       </div>
       {/* <div className="bg-background w-full rounded-3xl border-2 border-slate-200 relative flex items-center justify-center max-h-[500px]">
