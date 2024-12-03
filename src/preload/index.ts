@@ -5,27 +5,27 @@ import { exposeElectronTRPC } from 'electron-trpc/main'
 // import { exposeElectronTRPC } from 'electron-trpc'
 
 // Custom APIs for renderer
-const api = {
-  renameFile: (oldPath: string, newName: string) =>
-    ipcRenderer.invoke('rename-file', oldPath, newName),
-  processImages: (images: string[]): Promise<ProcessedImage[]> =>
-    ipcRenderer.invoke('get-image-data', images),
-  convertImage: (
-    imagePath: string,
-    format: ImageConversionType
-  ): Promise<Omit<ProcessedImage, 'status' | 'nameWithoutExtension'>> =>
-    ipcRenderer.invoke('convert-image', imagePath, format),
-  compressImage: (
-    imagePath: string,
-    quality: number
-  ): Promise<Omit<ProcessedImage, 'status' | 'nameWithoutExtension'>> =>
-    ipcRenderer.invoke('compress-image', imagePath, quality),
-  creactTempFile: (imagePath: string) => ipcRenderer.invoke('create-temp-file', imagePath),
-  saveTempFile: (tempFilePath: string, saveFilePath: string) =>
-    ipcRenderer.invoke('save-temp-file', tempFilePath, saveFilePath),
-  getDefaultDirectory: () => ipcRenderer.invoke('get-default-directory'),
-  selectFolder: () => ipcRenderer.invoke('select-folder')
-}
+// const api = {
+//   renameFile: (oldPath: string, newName: string) =>
+//     ipcRenderer.invoke('rename-file', oldPath, newName),
+//   processImages: (images: string[]): Promise<ProcessedImage[]> =>
+//     ipcRenderer.invoke('get-image-data', images),
+//   convertImage: (
+//     imagePath: string,
+//     format: ImageConversionType
+//   ): Promise<Omit<ProcessedImage, 'status' | 'nameWithoutExtension'>> =>
+//     ipcRenderer.invoke('convert-image', imagePath, format),
+//   compressImage: (
+//     imagePath: string,
+//     quality: number
+//   ): Promise<Omit<ProcessedImage, 'status' | 'nameWithoutExtension'>> =>
+//     ipcRenderer.invoke('compress-image', imagePath, quality),
+//   creactTempFile: (imagePath: string) => ipcRenderer.invoke('create-temp-file', imagePath),
+//   saveTempFile: (tempFilePath: string, saveFilePath: string) =>
+//     ipcRenderer.invoke('save-temp-file', tempFilePath, saveFilePath),
+//   getDefaultDirectory: () => ipcRenderer.invoke('get-default-directory'),
+//   selectFolder: () => ipcRenderer.invoke('select-folder')
+// }
 
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise
@@ -33,7 +33,7 @@ const api = {
 if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('electron', electronAPI)
-    contextBridge.exposeInMainWorld('api', api)
+    // contextBridge.exposeInMainWorld('api', api)
   } catch (error) {
     console.error(error)
   }
@@ -41,7 +41,7 @@ if (process.contextIsolated) {
   // @ts-ignore (define in dts)
   window.electron = electronAPI
   // @ts-ignore (define in dts)
-  window.api = api
+  // window.api = api
 }
 
 process.once('loaded', async () => {

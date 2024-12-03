@@ -6,37 +6,32 @@ import { procedure, router } from './trpc'
 import { z } from 'zod'
 
 export const imageRouter = router({
-  getData: procedure
-    .input(z.object({ imagePaths: z.array(z.string()) }))
-    .query(async ({ input }) => {
-      const { imagePaths } = input
-      try {
-        console.log('Processing images:', imagePaths)
-        const processedImages = await Promise.all(
-          imagePaths.map(async (imagePath) => {
-            const metadata = await sharp(imagePath).metadata()
+  // getData: procedure.input(z.object({ path: z.string() })).query(async ({ input }) => {
+  //   const { path } = input
+  //   try {
+  //     console.log('Processing images:', path)
 
-            // dont use sharp size here, its only for specific use cases instead use fs
-            const stats = fs.statSync(imagePath)
-            const fileSizeInBytes = stats.size
+  //         const metadata = await sharp(path).metadata()
 
-            const processedImage: ProcessedImage = {
-              path: imagePath,
-              size: fileSizeInBytes,
-              name: path.basename(imagePath),
-              nameWithoutExtension: path.basename(imagePath, path.extname(imagePath)),
-              fileType: metadata.format || 'unknown file type',
-              status: 'idle'
-            }
-            return processedImage
-          })
-        )
-        return processedImages // Send back the processed images' info to the renderer
-      } catch (error) {
-        console.error('Error processing images:', error)
-        throw error
-      }
-    }),
+  //         // dont use sharp size here, its only for specific use cases instead use fs
+  //         const stats = fs.statSync(path)
+  //         const fileSizeInBytes = stats.size
+
+  //         const processedImage: ProcessedImage = {
+  //           path: path,
+  //           size: fileSizeInBytes,
+  //           name: path.basename(path),
+  //           nameWithoutExtension: path.basename(path, path.extname(path)),
+  //           fileType: metadata.format || 'unknown file type',
+  //           status: 'idle'
+  //         }
+
+  //     return processedImages // Send back the processed images' info to the renderer
+  //   } catch (error) {
+  //     console.error('Error processing images:', error)
+  //     throw error
+  //   }
+  // }),
   convert: procedure
     .input(z.object({ imagePath: z.string(), format: z.string() }))
     .mutation(async ({ input }) => {

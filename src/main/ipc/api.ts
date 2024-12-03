@@ -8,3 +8,5 @@ export const api = router({
   image: imageRouter,
   system: systemRouter
 })
+
+export type AppRouter = typeof api

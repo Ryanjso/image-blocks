@@ -4,12 +4,6 @@ export type ProcessedImageProcessing = { status: 'processing' }
 export type ProcessedImageComplete = { status: 'success'; output: BaseImage }
 // eventually add a queued status so we don't have to show all as processing even when they arent
 
-export type ProcessedImagePayload =
-  | ProcessedImageIdle
-  | ProcessedImageProcessing
-  | ProcessedImageError
-  | ProcessedImageComplete
-
 export type ProcessedImage =
   | (BaseImage & ProcessedImageIdle)
   | (BaseImage & ProcessedImageProcessing)
@@ -23,5 +17,11 @@ export interface BaseImage {
   fileType: string // File type from sharp
   nameWithoutExtension: string
 }
+
+export type ProcessedImagePayload =
+  | ProcessedImageIdle
+  | ProcessedImageProcessing
+  | ProcessedImageError
+  | ProcessedImageComplete
 
 export type ImageConversionType = 'jpeg' | 'png' | 'webp'

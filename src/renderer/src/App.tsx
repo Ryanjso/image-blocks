@@ -1,7 +1,7 @@
-import { Folder, Play, PlusCircle } from 'lucide-react'
+import { Play, PlusCircle } from 'lucide-react'
 // import { Curve } from './assets/svg/curve'
 import { DropdownMenu, DropdownMenuTrigger } from './components/ui/DropdownMenu'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { ProcessedImage, ProcessedImagePayload } from 'src/types'
 import { FlowProvider } from './context/FlowContext'
 import { ResizeBlock } from './components/blocks/ResizeBlock'
@@ -15,14 +15,23 @@ import { CompressBlock } from './components/blocks/CompressBlock'
 import { TrimBlock } from './components/blocks/TrimBlock'
 import { RenameBlock } from './components/blocks/RenameBlock'
 import { useImageProcessing } from './hooks/useImageProcessing'
-import { Button, buttonVariants } from './components/ui/Button'
-import { cn } from './lib/utils'
+import { Button } from './components/ui/Button'
+
 import { FileBlock } from './components/FileBlock'
 // import { Arrow } from './assets/svg/arrow'
 import { ipcLink } from 'electron-trpc/renderer'
 import { createTRPCReact } from '@trpc/react-query'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { AppRouter } from '../../main/index'
+import { AppRouter } from 'src/main/ipc/api'
+import {
+  useAddImages,
+  useDropImages,
+  useGetDefaultDirectory,
+  useSelectDirectory,
+  useSelectImages
+} from './hooks/system.hooks'
+import { OutputDirectory } from './components/OutputDirectory'
+import { ImageUpload } from './components/ImageUpload'
 
 const FlowSchema = z.object({
   blocks: z.array(BlockSchema)
@@ -50,11 +59,13 @@ function App(): JSX.Element {
 }
 
 const Main = () => {
-  const { data } = trpcReact.greeting.useQuery({ name: 'world' })
-
+  // const [imagePaths, setImagePaths] = useState<string[]>([])
   const [images, setImages] = useState<ProcessedImage[]>([])
-  const [outputDirectory, setOutputDirectory] = useState<string>('')
 
+  const { data: outputDirectory, isLoading: isLoadingOutputDirectory } = useGetDefaultDirectory()
+  const { mutate: selectDirectory } = useSelectDirectory()
+  // const { data: images = [] } = useGetImageData({ imagePaths })
+  // const [{ data }] = useGetImagesData(imagePaths)
   const {
     createTempImage,
     renameImage,
@@ -81,48 +92,60 @@ const Main = () => {
     name: 'blocks'
   })
 
-  useEffect(() => {
-    const fetchDefaultDirectory = async () => {
-      try {
-        const defaultDirectory = await window.api.getDefaultDirectory()
-        setOutputDirectory(defaultDirectory)
-      } catch (error) {
-        console.error('Error fetching default directory:', error)
-      }
+  // const handleAddImages = async (files: FileList) => {
+  //   try {
+  //     // Extract the paths of the files to be added
+  //     const paths = Array.from(files).map((file) => file.path)
+
+  //     // Create a Set of the current image paths for efficient lookup
+  //     const currentImagePaths = new Set(imagePaths)
+
+  //     // Filter out any images that are already in the current state
+  //     const uniqueImagePaths = paths.filter((path) => !currentImagePaths.has(path))
+
+  //     // If there are no unique images, exit early
+  //     if (uniqueImagePaths.length === 0) {
+  //       console.log('No new images to add.')
+  //       return
+  //     }
+
+  //     // Update the list of image paths
+  //     setImagePaths((prevPaths) => [...prevPaths, ...uniqueImagePaths])
+
+  //     // Send only unique paths to the main process for processing
+  //     // const processedImages = await window.api.processImages(uniqueImagePaths)
+
+  //     // Update state with only the new processed images
+  //     // setImages((prevImages) => [...prevImages, ...processedImages])
+  //   } catch (error) {
+  //     console.error('Error adding images:', error)
+  //   }
+  // }
+
+  const { mutate: selectImages } = useSelectImages({
+    onSuccess: (data) => {
+      // add images to state, don't add duplicates
+      setImages((prevImages) => {
+        const newImages: ProcessedImage[] = data.filter(
+          (image) => !prevImages.some((prevImage) => prevImage.path === image.path)
+        )
+        return [...prevImages, ...newImages]
+      })
     }
+  })
 
-    fetchDefaultDirectory()
-  }, [])
+  const { mutate: addImages } = useAddImages()
 
-  const handleAddImages = async (files: FileList) => {
-    try {
-      // Extract the paths of the files to be added
-      const imagePaths = Array.from(files).map((file) => file.path)
+  const handleSelectImages = () => {
+    selectImages()
+  }
 
-      // Create a Set of the current image paths for efficient lookup
-      const currentImagePaths = new Set(images.map((img) => img.path))
-
-      // Filter out any images that are already in the current state
-      const uniqueImagePaths = imagePaths.filter((path) => !currentImagePaths.has(path))
-
-      // If there are no unique images, exit early
-      if (uniqueImagePaths.length === 0) {
-        console.log('No new images to add.')
-        return
-      }
-
-      // Send only unique paths to the main process for processing
-      const processedImages = await window.api.processImages(uniqueImagePaths)
-
-      // Update state with only the new processed images
-      setImages((prevImages) => [...prevImages, ...processedImages])
-    } catch (error) {
-      console.error('Error adding images:', error)
-    }
+  const handleDropImages = (filePaths: string[]) => {
+    addImages({ filePaths })
   }
 
   const handleRemoveImage = (path: string) => {
-    setImages((prevImages) => prevImages.filter((img) => img.path !== path))
+    setImages((prevImages) => prevImages.filter((image) => image.path !== path))
   }
 
   const onAddBlock = (type: Block['type']) => {
@@ -149,9 +172,10 @@ const Main = () => {
   }
 
   const updateImageStatus = (path: string, update: ProcessedImagePayload) => {
-    setImages((prevImages) =>
-      prevImages.map((image) => (image.path === path ? { ...image, ...update } : image))
-    )
+    // setImages((prevImages) =>
+    //   prevImages.map((image) => (image.path === path ? { ...image, ...update } : image))
+    // )
+    // use trpc utils to update image status
   }
 
   const processImage = async (image: ProcessedImage, blocks: Block[], index: number) => {
@@ -204,7 +228,7 @@ const Main = () => {
 
   const onSubmit = handleSubmit(async (data) => {
     // mark all images as processing
-    setImages((prevImages) => prevImages.map((image) => ({ ...image, status: 'processing' })))
+    // setImages((prevImages) => prevImages.map((image) => ({ ...image, status: 'processing' })))
 
     for (const [index, image] of images.entries()) {
       // eventually you can promise.allsettled or something equivalent here maybe with a max concurrency
@@ -233,62 +257,15 @@ const Main = () => {
       <div className="px-3 flex space-x-3  max-w-5xl mx-auto">
         <div className="bg-background w-full rounded-3xl border-2 border-slate-200 relative flex flex-col max-w-xl mx-auto">
           <div className="p-3 ">
-            <div className="w-full h-full bg-indigo-100 border-dashed border-indigo-400 py-7 border-[3px] rounded-2xl flex flex-col justify-center space-y-4">
-              <span className="text-indigo-400 font-medium text-center text-sm">
-                Drag your files here
-              </span>
-
-              <div className="flex justify-center">
-                <label
-                  htmlFor="file-upload"
-                  className={cn(
-                    buttonVariants({ variant: 'default', size: 'default' }),
-                    'hover:cursor-pointer'
-                  )}
-                >
-                  Browse Files
-                </label>
-                <input
-                  id="file-upload"
-                  className="hidden"
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={(e) => {
-                    const files = e.target.files
-
-                    if (files) {
-                      handleAddImages(files)
-                    }
-                  }}
-                />
-              </div>
-            </div>
+            <ImageUpload onHandleSelectImages={handleSelectImages} onFilesDrop={handleDropImages} />
           </div>
           <div className="border-slate-200 w-full border-b-2 " />
-          <div className="p-3">
-            <div className="bg-slate-100 flex justify-between p-4 rounded-xl space-x-8 items-center">
-              <div className="grid gap-1">
-                <p className="text-sm text-slate-500 font-medium">Output Directory:</p>
-                <p className="text-sm text-slate-800 font-semibold break break-all">
-                  {outputDirectory}
-                </p>
-              </div>
-              <Button
-                variant={'outline'}
-                onClick={async () => {
-                  const path = await window.api.selectFolder()
-                  console.log(path)
-                  if (path) {
-                    setOutputDirectory(path)
-                  }
-                }}
-              >
-                <Folder />
-                Change Directory
-              </Button>
-            </div>
-          </div>
+
+          <OutputDirectory
+            outputDirectory={outputDirectory}
+            onUpdateDirectory={selectDirectory}
+            isLoading={isLoadingOutputDirectory}
+          />
         </div>
       </div>
       <div className="grid gap-2 w-full mt-12 px-3 max-w-[900px] mx-auto">
