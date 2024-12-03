@@ -91,7 +91,7 @@ export const FileBlock = ({
         </button>
 
         {image.status === 'processing' ? (
-          <div className="pl-4 pr-2 flex justify-between items-center h-full">
+          <div className="pl-4 pr-2 flex justify-between items-center h-full ">
             <span className=" text-sm text-slate-500">Processing</span>
             <Button size={'icon'} variant={'ghost'} disabled>
               <Loader2 className="text-primary animate-spin" size={16} strokeWidth="2" />

@@ -202,10 +202,6 @@ const Main = () => {
         }
       }
 
-      console.log(
-        `saving file ${tempImagePath} to ${outputDirectory} with name ${outputImagePathWithoutExtension}`
-      )
-
       // handle output image path
       const outputImage = await saveFile({
         currentFilePath: tempImagePath,
@@ -225,7 +221,12 @@ const Main = () => {
 
   const onSubmit = handleSubmit(async (data) => {
     // mark all images as processing
-    // setImages((prevImages) => prevImages.map((image) => ({ ...image, status: 'processing' })))
+    setImages((prevImages) =>
+      prevImages.map((image) => ({
+        ...image,
+        status: 'processing'
+      }))
+    )
 
     for (const [index, image] of images.entries()) {
       // eventually you can promise.allsettled or something equivalent here maybe with a max concurrency
