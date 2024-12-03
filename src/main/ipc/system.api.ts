@@ -1,4 +1,4 @@
-import { app, dialog } from 'electron'
+import { app, dialog, shell } from 'electron'
 import { procedure, router } from './trpc'
 import * as path from 'path'
 import { z } from 'zod'
@@ -50,5 +50,11 @@ export const systemRouter = router({
 
       const images = await processImages(input.filePaths)
       return images
+    }),
+  openFileManagerToPath: procedure
+    .input(z.object({ filePath: z.string() }))
+    .mutation(async ({ input }) => {
+      const { filePath } = input
+      shell.showItemInFolder(filePath)
     })
 })

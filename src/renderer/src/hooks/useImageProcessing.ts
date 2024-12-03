@@ -1,11 +1,18 @@
 import { ConvertBlockSchema } from '@renderer/lib/schemas'
 import { replaceVariables } from '@renderer/lib/utils'
 import { z } from 'zod'
+import { useCreateTempFile } from './file.hooks'
+import { useCompressImage, useConvertImage, useTrimImage } from './image.hooks'
 
 export const useImageProcessing = () => {
+  const { mutateAsync: createTempFile } = useCreateTempFile()
+  const { mutateAsync: _convertImage } = useConvertImage()
+  const { mutateAsync: _compressImage } = useCompressImage()
+  const { mutateAsync: _trimImage } = useTrimImage()
+
   const createTempImage = async (imagePath: string) => {
     try {
-      const tempFilePath = await window.api.createTempFile(imagePath)
+      const tempFilePath = await createTempFile({ imagePath })
       return tempFilePath
     } catch (error) {
       console.error('Error creating temp image:', error)
@@ -16,13 +23,12 @@ export const useImageProcessing = () => {
   const resizeImage = async (imagePath: string, width: number, height: number) => {
     console.log('Resizing image', imagePath, 'to', width, 'x', height)
   }
-  const renameImage = async (imagePath: string, newName: string, imageIndex: number) => {
+  const renameImage = async (originalName: string, newName: string, imageIndex: number) => {
     const variables = {
-      name: newName,
+      name: originalName,
       index: (imageIndex + 1).toString()
     }
     const processedName = replaceVariables(newName, variables)
-    console.log('Renaming image', imagePath, 'to', processedName)
     return processedName
   }
   const cropImage = async (
@@ -38,15 +44,13 @@ export const useImageProcessing = () => {
     imagePath: string,
     format: z.infer<typeof ConvertBlockSchema>['outputType']
   ) => {
-    const output = await window.api.convertImage(imagePath, format)
-    console.log('Converted image', imagePath, 'to', output)
+    return await _convertImage({ imagePath, format })
   }
   const compressImage = async (imagePath: string, quality: number) => {
-    const output = await window.api.compressImage(imagePath, quality)
-    console.log('Compressed image', imagePath, 'to', output)
+    await _compressImage({ imagePath, quality })
   }
   const trimImage = async (imagePath: string) => {
-    console.log('Trimming image', imagePath)
+    await _trimImage({ imagePath })
   }
 
   return {

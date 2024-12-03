@@ -32,6 +32,7 @@ import {
 import { OutputDirectory } from './components/OutputDirectory'
 import { ImageUpload } from './components/ImageUpload'
 import { getUniqueImages } from './lib/utils'
+import { useSaveFile } from './hooks/file.hooks'
 
 const FlowSchema = z.object({
   blocks: z.array(BlockSchema)
@@ -112,6 +113,8 @@ const Main = () => {
     }
   })
 
+  const { mutateAsync: saveFile } = useSaveFile()
+
   const handleSelectImages = () => {
     selectImages()
   }
@@ -161,10 +164,9 @@ const Main = () => {
 
   const processImage = async (image: ProcessedImage, blocks: Block[], index: number) => {
     // create a temporary image to make changes to
-    const tempImagePath = await createTempImage(image.path)
+    let tempImagePath = await createTempImage(image.path)
 
-    // append '-output' to the image path before the extension
-    let outputImagePathWithoutExtension = image.nameWithoutExtension + '-output'
+    let outputImagePathWithoutExtension = image.nameWithoutExtension
 
     try {
       for (const block of blocks) {
@@ -174,7 +176,11 @@ const Main = () => {
             break
           case 'rename': {
             // note were not passing in temp path here
-            const newOutputWithoutExtension = await renameImage(image.path, block.newName, index)
+            const newOutputWithoutExtension = await renameImage(
+              image.nameWithoutExtension,
+              block.newName,
+              index
+            )
             outputImagePathWithoutExtension = newOutputWithoutExtension
             break
           }
@@ -182,7 +188,8 @@ const Main = () => {
             await cropImage(tempImagePath, block.left, block.top, block.width, block.height)
             break
           case 'convert': {
-            await convertImage(tempImagePath, block.outputType)
+            const convertedImage = await convertImage(tempImagePath, block.outputType)
+            tempImagePath = convertedImage.path
             break
           }
           case 'compress': {
@@ -195,15 +202,24 @@ const Main = () => {
         }
       }
 
+      console.log(
+        `saving file ${tempImagePath} to ${outputDirectory} with name ${outputImagePathWithoutExtension}`
+      )
+
       // handle output image path
+      const outputImage = await saveFile({
+        currentFilePath: tempImagePath,
+        outputDirectory,
+        outputFileNameWithoutExt: outputImagePathWithoutExtension
+      })
 
       // set image status to complete
-      updateImageStatus(image.path, { status: 'success' })
+      updateImageStatus(image.path, { status: 'success', output: outputImage })
     } catch (error) {
       console.error('Error processing image:', error)
 
       // set image status to error
-      updateImageStatus(image.path, 'error')
+      updateImageStatus(image.path, { status: 'error', errorMessage: error.message })
     }
   }
 

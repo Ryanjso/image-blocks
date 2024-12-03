@@ -36,6 +36,9 @@ export const imageRouter = router({
     .input(z.object({ imagePath: z.string(), format: z.string() }))
     .mutation(async ({ input }) => {
       const { imagePath, format } = input
+
+      console.log(`Converting image ${imagePath} to ${format}`)
+
       try {
         const directory = path.dirname(imagePath)
         const fileName = path.basename(imagePath, path.extname(imagePath))
@@ -54,6 +57,8 @@ export const imageRouter = router({
           name: newFileName,
           fileType: output.format || format
         }
+
+        console.log(`Image converted to ${format} and saved at ${newPath}`)
 
         return image
       } catch (error) {

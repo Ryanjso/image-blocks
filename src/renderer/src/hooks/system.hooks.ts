@@ -15,3 +15,9 @@ export const useSelectImages = (options?: ReactQueryOptions['system']['selectIma
 export const useAddImages = (options?: ReactQueryOptions['system']['addImages']) => {
   return trpc.system.addImages.useMutation(options)
 }
+
+export const useOpenFileManagerToPath = (
+  options?: ReactQueryOptions['system']['openFileManagerToPath']
+) => {
+  return trpc.system.openFileManagerToPath.useMutation(options)
+}

@@ -3,6 +3,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { z } from 'zod'
 import { procedure, router } from './trpc'
+import { BaseImage } from '../../types'
 
 export const fileRouter = router({
   rename: procedure
@@ -52,6 +53,21 @@ export const fileRouter = router({
       const newPath = path.join(outputDirectory, newFileName)
 
       fs.copyFileSync(currentFilePath, newPath) // Copy the file to the output directory
-      return newPath // Return the new path after saving
+      // return newPath // Return the new path after saving
+
+      // return a BaseImage
+
+      const stats = fs.statSync(newPath)
+      const fileSizeInBytes = stats.size
+
+      const image: BaseImage = {
+        path: newPath,
+        size: fileSizeInBytes,
+        name: newFileName,
+        nameWithoutExtension: outputFileNameWithoutExt,
+        fileType: originalExtension
+      }
+
+      return image
     })
 })

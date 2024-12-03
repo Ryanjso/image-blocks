@@ -1,6 +1,7 @@
 import { ArrowRight, Loader2, Play, SquareArrowOutUpRight, X } from 'lucide-react'
 import { ProcessedImage } from 'src/types'
 import { Button } from './ui/Button'
+import { useOpenFileManagerToPath } from '@renderer/hooks/system.hooks'
 
 const ImageSize = ({ sizeInBytes }: { sizeInBytes: number }) => {
   const formatSize = (size: number) => {
@@ -37,7 +38,7 @@ const ImageInfo = ({
   size: number
 }) => {
   return (
-    <>
+    <div className="flex items-center space-x-2">
       <div className="rounded-md h-14 w-14 overflow-hidden">
         <img
           src={'local-file://' + encodeURIComponent(path)}
@@ -55,7 +56,7 @@ const ImageInfo = ({
           <span>{fileType}</span>
         </div>
       </div>
-    </>
+    </div>
   )
 }
 
@@ -66,6 +67,12 @@ export const FileBlock = ({
   image: ProcessedImage
   remove: (imagePath: string) => void
 }) => {
+  const { mutate: openImageInFileManager } = useOpenFileManagerToPath()
+
+  const onOpenInFileManager = (path: string) => {
+    openImageInFileManager({ filePath: path })
+  }
+
   const { path, nameWithoutExtension, fileType } = image
   return (
     <div key={image.path} className="flex gap-2 justify-between w-full relative">
@@ -98,7 +105,13 @@ export const FileBlock = ({
               fileType={image.output.fileType}
               size={image.output.size}
             />
-            <SquareArrowOutUpRight className="text-primary" size={18} strokeWidth="2" />
+            <Button
+              size={'icon'}
+              variant={'ghost'}
+              onClick={() => onOpenInFileManager(image.output.path)}
+            >
+              <SquareArrowOutUpRight className="text-primary" size={18} strokeWidth="2" />
+            </Button>
           </div>
         ) : image.status === 'error' ? (
           <div className="px-4 flex justify-between">
