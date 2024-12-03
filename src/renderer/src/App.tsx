@@ -25,13 +25,13 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AppRouter } from 'src/main/ipc/api'
 import {
   useAddImages,
-  useDropImages,
   useGetDefaultDirectory,
   useSelectDirectory,
   useSelectImages
 } from './hooks/system.hooks'
 import { OutputDirectory } from './components/OutputDirectory'
 import { ImageUpload } from './components/ImageUpload'
+import { getUniqueImages } from './lib/utils'
 
 const FlowSchema = z.object({
   blocks: z.array(BlockSchema)
@@ -59,13 +59,19 @@ function App(): JSX.Element {
 }
 
 const Main = () => {
-  // const [imagePaths, setImagePaths] = useState<string[]>([])
   const [images, setImages] = useState<ProcessedImage[]>([])
+  const [selectedOutputDirectory, setSelectedOutputDirectory] = useState<string>()
+  const { data: defaultOutputDirectory, isLoading: isLoadingOutputDirectory } =
+    useGetDefaultDirectory()
 
-  const { data: outputDirectory, isLoading: isLoadingOutputDirectory } = useGetDefaultDirectory()
-  const { mutate: selectDirectory } = useSelectDirectory()
-  // const { data: images = [] } = useGetImageData({ imagePaths })
-  // const [{ data }] = useGetImagesData(imagePaths)
+  const outputDirectory = selectedOutputDirectory || defaultOutputDirectory || ''
+
+  const { mutate: selectDirectory } = useSelectDirectory({
+    onSuccess: (data) => {
+      if (data) setSelectedOutputDirectory(data)
+    }
+  })
+
   const {
     createTempImage,
     renameImage,
@@ -92,49 +98,19 @@ const Main = () => {
     name: 'blocks'
   })
 
-  // const handleAddImages = async (files: FileList) => {
-  //   try {
-  //     // Extract the paths of the files to be added
-  //     const paths = Array.from(files).map((file) => file.path)
-
-  //     // Create a Set of the current image paths for efficient lookup
-  //     const currentImagePaths = new Set(imagePaths)
-
-  //     // Filter out any images that are already in the current state
-  //     const uniqueImagePaths = paths.filter((path) => !currentImagePaths.has(path))
-
-  //     // If there are no unique images, exit early
-  //     if (uniqueImagePaths.length === 0) {
-  //       console.log('No new images to add.')
-  //       return
-  //     }
-
-  //     // Update the list of image paths
-  //     setImagePaths((prevPaths) => [...prevPaths, ...uniqueImagePaths])
-
-  //     // Send only unique paths to the main process for processing
-  //     // const processedImages = await window.api.processImages(uniqueImagePaths)
-
-  //     // Update state with only the new processed images
-  //     // setImages((prevImages) => [...prevImages, ...processedImages])
-  //   } catch (error) {
-  //     console.error('Error adding images:', error)
-  //   }
-  // }
-
   const { mutate: selectImages } = useSelectImages({
     onSuccess: (data) => {
       // add images to state, don't add duplicates
-      setImages((prevImages) => {
-        const newImages: ProcessedImage[] = data.filter(
-          (image) => !prevImages.some((prevImage) => prevImage.path === image.path)
-        )
-        return [...prevImages, ...newImages]
-      })
+      setImages((prevImages) => getUniqueImages(prevImages, data))
     }
   })
 
-  const { mutate: addImages } = useAddImages()
+  const { mutate: addImages } = useAddImages({
+    onSuccess: (data) => {
+      // add images to state, don't add duplicates
+      setImages((prevImages) => getUniqueImages(prevImages, data))
+    }
+  })
 
   const handleSelectImages = () => {
     selectImages()
@@ -172,10 +148,15 @@ const Main = () => {
   }
 
   const updateImageStatus = (path: string, update: ProcessedImagePayload) => {
-    // setImages((prevImages) =>
-    //   prevImages.map((image) => (image.path === path ? { ...image, ...update } : image))
-    // )
-    // use trpc utils to update image status
+    setImages((prevImages) =>
+      prevImages.map((image) => {
+        if (image.path === path) {
+          return { ...image, ...update }
+        }
+
+        return image
+      })
+    )
   }
 
   const processImage = async (image: ProcessedImage, blocks: Block[], index: number) => {
@@ -240,13 +221,6 @@ const Main = () => {
     <div className="font-sans pb-16 relative">
       <div className="p-3 draggable sticky top-0 z-10">
         <div className="bg-background py-2 rounded-lg border-2 border-slate-200 flex justify-end px-2 sticky top-0">
-          {/* <button
-            className="bg-indigo-500 text-white px-5 py-2 rounded-3xl self-center flex items-center space-x-4 no-drag hover:bg-indigo-600"
-            onClick={onSubmit}
-          >
-            <span className="text-sm font-semibold">Run</span>
-            <Play size={16} strokeWidth={2} />
-          </button> */}
           <Button onClick={onSubmit} className="no-drag">
             <Play size={16} strokeWidth={2} />
             Run
@@ -269,7 +243,7 @@ const Main = () => {
         </div>
       </div>
       <div className="grid gap-2 w-full mt-12 px-3 max-w-[900px] mx-auto">
-        {images.map((image, index) => (
+        {images.map((image) => (
           <FileBlock key={image.path} image={image} remove={handleRemoveImage} />
         ))}
       </div>
