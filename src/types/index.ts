@@ -1,14 +1,12 @@
-export type ProcessedImageError = { status: 'error'; errorMessage: string }
-export type ProcessedImageIdle = { status: 'idle' }
-export type ProcessedImageProcessing = { status: 'processing' }
-export type ProcessedImageComplete = { status: 'success'; output: BaseImage }
+export type ImageError = { status: 'error'; errorMessage: string }
+export type ImageIdle = { status: 'idle' }
+export type ImageProcessing = { status: 'processing' }
+export type ImageSuccess = { status: 'success'; output: BaseImage }
 // eventually add a queued status so we don't have to show all as processing even when they arent
 
-export type ProcessedImage =
-  | (BaseImage & ProcessedImageIdle)
-  | (BaseImage & ProcessedImageProcessing)
-  | (BaseImage & ProcessedImageError)
-  | (BaseImage & ProcessedImageComplete)
+export type ImageStatus = ImageError | ImageIdle | ImageProcessing | ImageSuccess
+
+export type ImageWithStatus = BaseImage & ImageStatus
 
 export interface BaseImage {
   path: string
@@ -18,10 +16,4 @@ export interface BaseImage {
   nameWithoutExtension: string
 }
 
-export type ProcessedImagePayload =
-  | ProcessedImageIdle
-  | ProcessedImageProcessing
-  | ProcessedImageError
-  | ProcessedImageComplete
-
-export type ImageConversionType = 'jpeg' | 'png' | 'webp'
+export type ImageOutputFormat = 'jpeg' | 'png' | 'webp'

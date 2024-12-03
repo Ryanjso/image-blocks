@@ -1,5 +1,5 @@
 import { ArrowRight, Loader2, Play, SquareArrowOutUpRight, X } from 'lucide-react'
-import { ProcessedImage } from 'src/types'
+import { ImageWithStatus } from 'src/types'
 import { Button } from './ui/Button'
 import { useOpenFileManagerToPath } from '@renderer/hooks/system.hooks'
 
@@ -64,7 +64,7 @@ export const FileBlock = ({
   image,
   remove
 }: {
-  image: ProcessedImage
+  image: ImageWithStatus
   remove: (imagePath: string) => void
 }) => {
   const { mutate: openImageInFileManager } = useOpenFileManagerToPath()

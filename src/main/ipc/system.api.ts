@@ -2,8 +2,9 @@ import { app, dialog, shell } from 'electron'
 import { procedure, router } from './trpc'
 import * as path from 'path'
 import { z } from 'zod'
-import { processImages } from '../helpers/system.helpers'
+
 import { TRPCError } from '@trpc/server'
+import { getImagesData } from '../helpers/system.helpers'
 
 export const systemRouter = router({
   getDefaultDirectory: procedure.query(() => {
@@ -27,7 +28,7 @@ export const systemRouter = router({
 
     if (result.canceled) return []
 
-    const images = await processImages(result.filePaths)
+    const images = await getImagesData(result.filePaths)
 
     return images
   }),
@@ -48,7 +49,8 @@ export const systemRouter = router({
         }
       }
 
-      const images = await processImages(input.filePaths)
+      const images = await getImagesData(input.filePaths)
+
       return images
     }),
   openFileManagerToPath: procedure

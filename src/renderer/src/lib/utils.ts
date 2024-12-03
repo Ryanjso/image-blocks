@@ -1,5 +1,5 @@
 import { clsx, type ClassValue } from 'clsx'
-import { ProcessedImage } from 'src/types'
+import { ImageWithStatus } from 'src/types'
 import { twMerge } from 'tailwind-merge'
 
 export function cn(...inputs: ClassValue[]): string {
@@ -22,11 +22,11 @@ export const replaceVariables = (input: string, variables: Record<string, string
   return replacedString
 }
 
-export const getUniqueImages = (prevImages: ProcessedImage[], newImages: ProcessedImage[]) => {
+export const getUniqueImages = (prevImages: ImageWithStatus[], newImages: ImageWithStatus[]) => {
   const seenPaths = new Set<string>()
 
   // Helper function to filter unique images
-  const filterUnique = (images: ProcessedImage[]) => {
+  const filterUnique = (images: ImageWithStatus[]) => {
     return images.filter((image) => {
       if (seenPaths.has(image.path)) {
         return false

@@ -3,7 +3,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { z } from 'zod'
 import { procedure, router } from './trpc'
-import { BaseImage } from '../../types'
+import { getImageData } from '../helpers/system.helpers'
 
 export const fileRouter = router({
   rename: procedure
@@ -46,28 +46,15 @@ export const fileRouter = router({
         outputFileNameWithoutExt: z.string()
       })
     )
-    .mutation((req) => {
-      const { currentFilePath, outputDirectory, outputFileNameWithoutExt } = req.input
+    .mutation(async ({ input }) => {
+      const { currentFilePath, outputDirectory, outputFileNameWithoutExt } = input
       const originalExtension = path.extname(currentFilePath) // Extract the original extension
       const newFileName = outputFileNameWithoutExt + originalExtension // Append original extension to the new name
       const newPath = path.join(outputDirectory, newFileName)
 
       fs.copyFileSync(currentFilePath, newPath) // Copy the file to the output directory
-      // return newPath // Return the new path after saving
 
-      // return a BaseImage
-
-      const stats = fs.statSync(newPath)
-      const fileSizeInBytes = stats.size
-
-      const image: BaseImage = {
-        path: newPath,
-        size: fileSizeInBytes,
-        name: newFileName,
-        nameWithoutExtension: outputFileNameWithoutExt,
-        fileType: originalExtension
-      }
-
+      const image = await getImageData(newPath)
       return image
     })
 })

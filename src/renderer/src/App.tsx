@@ -2,7 +2,7 @@ import { Play, PlusCircle } from 'lucide-react'
 // import { Curve } from './assets/svg/curve'
 import { DropdownMenu, DropdownMenuTrigger } from './components/ui/DropdownMenu'
 import { useState } from 'react'
-import { ProcessedImage, ProcessedImagePayload } from 'src/types'
+import { ImageWithStatus, ImageStatus } from 'src/types'
 import { FlowProvider } from './context/FlowContext'
 import { ResizeBlock } from './components/blocks/ResizeBlock'
 import { NewBlockDropdownMenuContent } from './components/NewBlockDropdownMenuContent'
@@ -60,7 +60,7 @@ function App(): JSX.Element {
 }
 
 const Main = () => {
-  const [images, setImages] = useState<ProcessedImage[]>([])
+  const [images, setImages] = useState<ImageWithStatus[]>([])
   const [selectedOutputDirectory, setSelectedOutputDirectory] = useState<string>()
   const { data: defaultOutputDirectory, isLoading: isLoadingOutputDirectory } =
     useGetDefaultDirectory()
@@ -101,15 +101,19 @@ const Main = () => {
 
   const { mutate: selectImages } = useSelectImages({
     onSuccess: (data) => {
+      // mark all images as idle
+      const idleImages: ImageWithStatus[] = data.map((image) => ({ ...image, status: 'idle' }))
       // add images to state, don't add duplicates
-      setImages((prevImages) => getUniqueImages(prevImages, data))
+      setImages((prevImages) => getUniqueImages(prevImages, idleImages))
     }
   })
 
   const { mutate: addImages } = useAddImages({
     onSuccess: (data) => {
+      // mark all images as idle
+      const idleImages: ImageWithStatus[] = data.map((image) => ({ ...image, status: 'idle' }))
       // add images to state, don't add duplicates
-      setImages((prevImages) => getUniqueImages(prevImages, data))
+      setImages((prevImages) => getUniqueImages(prevImages, idleImages))
     }
   })
 
@@ -150,7 +154,7 @@ const Main = () => {
     }
   }
 
-  const updateImageStatus = (path: string, update: ProcessedImagePayload) => {
+  const updateImageStatus = (path: string, update: ImageStatus) => {
     setImages((prevImages) =>
       prevImages.map((image) => {
         if (image.path === path) {
@@ -162,7 +166,7 @@ const Main = () => {
     )
   }
 
-  const processImage = async (image: ProcessedImage, blocks: Block[], index: number) => {
+  const processImage = async (image: ImageWithStatus, blocks: Block[], index: number) => {
     // create a temporary image to make changes to
     let tempImagePath = await createTempImage(image.path)
 

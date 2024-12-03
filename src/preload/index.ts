@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
-import { ImageConversionType, ProcessedImage } from '../types'
+import { ImageOutputFormat, ImageWithStatus } from '../types'
 import { exposeElectronTRPC } from 'electron-trpc/main'
 // import { exposeElectronTRPC } from 'electron-trpc'
 
@@ -8,17 +8,17 @@ import { exposeElectronTRPC } from 'electron-trpc/main'
 // const api = {
 //   renameFile: (oldPath: string, newName: string) =>
 //     ipcRenderer.invoke('rename-file', oldPath, newName),
-//   processImages: (images: string[]): Promise<ProcessedImage[]> =>
+//   processImages: (images: string[]): Promise<ImageWithStatus[]> =>
 //     ipcRenderer.invoke('get-image-data', images),
 //   convertImage: (
 //     imagePath: string,
-//     format: ImageConversionType
-//   ): Promise<Omit<ProcessedImage, 'status' | 'nameWithoutExtension'>> =>
+//     format: ImageOutputFormat
+//   ): Promise<Omit<ImageWithStatus, 'status' | 'nameWithoutExtension'>> =>
 //     ipcRenderer.invoke('convert-image', imagePath, format),
 //   compressImage: (
 //     imagePath: string,
 //     quality: number
-//   ): Promise<Omit<ProcessedImage, 'status' | 'nameWithoutExtension'>> =>
+//   ): Promise<Omit<ImageWithStatus, 'status' | 'nameWithoutExtension'>> =>
 //     ipcRenderer.invoke('compress-image', imagePath, quality),
 //   creactTempFile: (imagePath: string) => ipcRenderer.invoke('create-temp-file', imagePath),
 //   saveTempFile: (tempFilePath: string, saveFilePath: string) =>
