@@ -68,10 +68,7 @@ const ImageInfo = ({
         />
       </div>
       <div className="flex flex-col flex-1 overflow-hidden">
-        <span className="text-slate-800 font-medium text-sm truncate">
-          {name}
-          super-freaking-longnamesuper-freaking-longnamesuper-freaking-longnamesuper-freaking-longnamesuper-freaking-longnamesuper-freaking-longname
-        </span>
+        <span className="text-slate-800 font-medium text-sm truncate">{name}</span>
         <div className="text-slate-500 text-sm flex gap-1.5 items-center">
           <span>
             <ImageSize sizeInBytes={size} />
@@ -115,16 +112,16 @@ export const FileBlock = ({
       <div className="bg-white border-2 border-slate-200 rounded-lg  p-1 flex gap-3 items-center flex-1 overflow-hidden">
         <ImageInfo name={nameWithoutExtension} path={path} fileType={fileType} size={image.size} />
       </div>
-      <div className="bg-white border-2 border-slate-200 rounded-lg   p-1 relative flex-1 flex overflow-hidden">
+      <div className="bg-white border-2 border-slate-200 rounded-lg p-1 relative flex-1 flex overflow-hidden">
         {image.status === 'processing' ? (
-          <div className="pl-4 pr-2 flex justify-between items-center h-full ">
+          <div className="pl-4 pr-2 flex justify-between items-center h-full flex-1">
             <span className=" text-sm text-slate-500">Processing</span>
             <Button size={'icon'} variant={'ghost'} disabled>
               <Loader2 className="text-primary animate-spin" size={16} strokeWidth="2" />
             </Button>
           </div>
         ) : image.status === 'success' ? (
-          <div className="pl-2 pr-2 gap-2 flex justify-between items-center h-full overflow-hidden">
+          <div className="pl-2 pr-2 gap-2 flex flex-1 justify-between items-center h-full overflow-hidden">
             <ImageInfo
               name={image.output.nameWithoutExtension}
               path={image.output.path}
@@ -145,14 +142,14 @@ export const FileBlock = ({
             </div>
           </div>
         ) : image.status === 'error' ? (
-          <div className="px-4 flex justify-between">
+          <div className="px-4 flex justify-between flex-1">
             <span className=" text-sm text-destructive">
               There was an error processing this image
             </span>
           </div>
         ) : (
           // Idle state
-          <div className="pl-4 pr-2 flex justify-between items-center h-full">
+          <div className="pl-4 pr-2 flex justify-between items-center h-full flex-1">
             <span className=" text-sm text-slate-500">Press run to begin processing</span>
             <Button size={'icon'} variant={'ghost'} onClick={() => onRunClick()}>
               <Play className="text-primary" size={16} strokeWidth="2" />

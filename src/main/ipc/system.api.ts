@@ -5,12 +5,16 @@ import { z } from 'zod'
 
 import { TRPCError } from '@trpc/server'
 import { getImagesData } from '../helpers/system.helpers'
+import { userPreferencesStorage } from '../lib/storage'
 
 export const systemRouter = router({
   getDefaultDirectory: procedure.query(() => {
+    // get the default output directory from user preferences
+    const defaultOutputDirectory = userPreferencesStorage.load()?.defaultOutputDirectory
+
     // its technically possible for this to not exist
     // so eventually create a fallback or error handling
-    return app.getPath('documents')
+    return defaultOutputDirectory ?? app.getPath('documents')
   }),
   selectDirectory: procedure.mutation(async () => {
     const result = await dialog.showOpenDialog({
@@ -18,6 +22,12 @@ export const systemRouter = router({
     })
 
     if (result.canceled) return null
+    const directory = result.filePaths[0]
+    if (!directory) return null
+
+    // store the directory in user preferences
+    userPreferencesStorage.save({ defaultOutputDirectory: directory })
+
     return result.filePaths[0]
   }),
   selectImages: procedure.mutation(async () => {

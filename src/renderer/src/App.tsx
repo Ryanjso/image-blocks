@@ -65,6 +65,8 @@ const Main = () => {
   const { data: defaultOutputDirectory, isLoading: isLoadingOutputDirectory } =
     useGetDefaultDirectory()
 
+  const isRunning = images.some((image) => image.status === 'processing') // maybe memoize this
+
   const outputDirectory = selectedOutputDirectory || defaultOutputDirectory || ''
 
   const { mutate: selectDirectory } = useSelectDirectory({
@@ -258,7 +260,11 @@ const Main = () => {
     <div className="font-sans pb-16 relative">
       <div className="p-3 draggable sticky top-0 z-10">
         <div className="bg-background py-2 rounded-lg border-2 border-slate-200 flex justify-end px-2 sticky top-0">
-          <Button onClick={handleSubmit((data) => onSubmit(data))} className="no-drag">
+          <Button
+            onClick={handleSubmit((data) => onSubmit(data))}
+            className="no-drag"
+            disabled={isRunning}
+          >
             <Play size={16} strokeWidth={2} />
             Run
           </Button>
