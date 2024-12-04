@@ -279,7 +279,7 @@ const Main = () => {
           />
         </div>
       </div>
-      <div className="grid gap-2 w-full mt-12 px-3 max-w-[900px] mx-auto">
+      <div className=" gap-2 w-full mt-12 px-3 max-w-[900px] mx-auto flex flex-col">
         {images.map((image, index) => (
           <FileBlock
             key={image.path}
