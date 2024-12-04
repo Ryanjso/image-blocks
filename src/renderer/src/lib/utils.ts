@@ -1,4 +1,6 @@
+import { TRPCClientError } from '@trpc/client'
 import { clsx, type ClassValue } from 'clsx'
+import { AppRouter } from 'src/main/ipc/api'
 import { ImageWithStatus } from 'src/types'
 import { twMerge } from 'tailwind-merge'
 
@@ -41,4 +43,10 @@ export const getUniqueImages = (prevImages: ImageWithStatus[], newImages: ImageW
 
   // Combine new images first, followed by previous images
   return [...uniqueNewImages, ...uniquePrevImages]
+}
+
+// this is a hack until I find a solution to this
+// https://github.com/jsonnull/electron-trpc/issues/209
+export const isTRPCClientError = (error: unknown): error is TRPCClientError<AppRouter> => {
+  return typeof error === 'object' && error !== null && error['name'] === 'TRPCClientError'
 }

@@ -16,7 +16,6 @@ import { TrimBlock } from './components/blocks/TrimBlock'
 import { RenameBlock } from './components/blocks/RenameBlock'
 import { useImageProcessing } from './hooks/useImageProcessing'
 import { Button } from './components/ui/Button'
-import { TRPCClientError } from '@trpc/client'
 
 import { FileBlock } from './components/FileBlock'
 // import { Arrow } from './assets/svg/arrow'
@@ -32,7 +31,7 @@ import {
 } from './hooks/system.hooks'
 import { OutputDirectory } from './components/OutputDirectory'
 import { ImageUpload } from './components/ImageUpload'
-import { getUniqueImages } from './lib/utils'
+import { getUniqueImages, isTRPCClientError } from './lib/utils'
 import { useSaveFile } from './hooks/file.hooks'
 
 const FlowSchema = z.object({
@@ -221,7 +220,7 @@ const Main = () => {
 
       // set image status to error
       let errorMessage = 'An error occurred while processing this image'
-      if (error instanceof TRPCClientError) {
+      if (isTRPCClientError(error)) {
         errorMessage = error['message']
       } else if (error instanceof Error) {
         errorMessage = error.message
