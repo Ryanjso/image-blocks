@@ -3,8 +3,8 @@ import { Button } from './ui/Button'
 
 export const OutputDirectory = ({
   outputDirectory,
-  onUpdateDirectory,
-  isLoading
+  onUpdateDirectory
+  // isLoading
 }: {
   outputDirectory: string | undefined
   onUpdateDirectory: () => void

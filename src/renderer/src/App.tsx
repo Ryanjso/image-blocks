@@ -3,7 +3,7 @@ import { Play, PlusCircle } from 'lucide-react'
 import { DropdownMenu, DropdownMenuTrigger } from './components/ui/DropdownMenu'
 import { useState } from 'react'
 import { ImageWithStatus, ImageStatus } from 'src/types'
-import { FlowProvider } from './context/FlowContext'
+// import { FlowProvider } from './context/FlowContext'
 import { ResizeBlock } from './components/blocks/ResizeBlock'
 import { NewBlockDropdownMenuContent } from './components/NewBlockDropdownMenuContent'
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
@@ -392,9 +392,9 @@ const Main = () => {
 
 const WrappedApp = () => {
   return (
-    <FlowProvider>
-      <App />
-    </FlowProvider>
+    // <FlowProvider>
+    <App />
+    // </FlowProvider>
   )
 }
 
