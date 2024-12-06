@@ -1,5 +1,4 @@
-// import { FlipHorizontal, PenLine, Scaling, Scissors, Shrink } from 'lucide-react'
-import { FlipHorizontal, PenLine, Scaling, Scissors, Shrink } from 'lucide-react'
+import { Fingerprint, FlipHorizontal, PenLine, Scaling, Scissors, Shrink } from 'lucide-react'
 import { DropdownMenuContent, DropdownMenuItem } from './ui/DropdownMenu'
 
 import { Block } from '@renderer/lib/schemas'
@@ -10,7 +9,7 @@ export const NewBlockDropdownMenuContent = ({
   addBlock: (blockType: Block['type']) => void
 }) => {
   return (
-    <DropdownMenuContent className="w-56">
+    <DropdownMenuContent className=" w-56">
       {/* <DropdownMenuLabel>My Account</DropdownMenuLabel> */}
       {/* <DropdownMenuSeparator /> */}
       <DropdownMenuItem onClick={() => addBlock('convert')}>
@@ -32,6 +31,13 @@ export const NewBlockDropdownMenuContent = ({
       <DropdownMenuItem onClick={() => addBlock('trim')}>
         <Scissors className="mr-2 h-4 w-4" />
         <span>Trim transparent pixels</span>
+      </DropdownMenuItem>
+
+      {/* to do */}
+      {/* This includes details like camera model, GPS coordinates, timestamps, etc., that are stored in image files. */}
+      <DropdownMenuItem disabled>
+        <Fingerprint className="mr-2 h-4 w-4" />
+        <span>Remove metadata</span>
       </DropdownMenuItem>
     </DropdownMenuContent>
   )

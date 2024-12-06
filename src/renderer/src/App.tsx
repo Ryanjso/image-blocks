@@ -3,7 +3,6 @@ import { Play, PlusCircle } from 'lucide-react'
 import { DropdownMenu, DropdownMenuTrigger } from './components/ui/DropdownMenu'
 import { useState } from 'react'
 import { ImageWithStatus, ImageStatus } from 'src/types'
-// import { FlowProvider } from './context/FlowContext'
 import { ResizeBlock } from './components/blocks/ResizeBlock'
 import { NewBlockDropdownMenuContent } from './components/NewBlockDropdownMenuContent'
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
@@ -177,9 +176,17 @@ const Main = () => {
     try {
       for (const block of blocks) {
         switch (block.type) {
-          case 'resize':
-            await resizeImage(tempImagePath, block.width, block.height)
+          case 'resize': {
+            const dimensions =
+              block.mode === 'proportionalHeight'
+                ? { width: block.width }
+                : block.mode === 'proportionalWidth'
+                  ? { height: block.height }
+                  : { width: block.width, height: block.height }
+
+            await resizeImage(tempImagePath, dimensions)
             break
+          }
           case 'rename': {
             // note were not passing in temp path here
             const newOutputWithoutExtension = await renameImage(

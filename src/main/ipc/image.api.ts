@@ -4,6 +4,7 @@ import { procedure, router } from './trpc'
 import { z } from 'zod'
 import { getImageData } from '../helpers/system.helpers'
 import { TRPCError } from '@trpc/server'
+import fs from 'fs'
 
 export const imageRouter = router({
   convert: procedure
@@ -17,7 +18,11 @@ export const imageRouter = router({
         const newFileName = `${fileName}.${format}`
         const newPath = path.join(directory, newFileName)
 
-        await sharp(imagePath).toFormat(format).toFile(newPath)
+        const buffer = await sharp(imagePath).toFormat(format).toBuffer()
+        await sharp(buffer).toFile(newPath)
+
+        // delete the original (temporary) image path
+        fs.unlinkSync(imagePath)
 
         const image = getImageData(newPath)
 
@@ -41,19 +46,26 @@ export const imageRouter = router({
         const metadata = await sharp(imagePath).metadata()
         const format = metadata.format
 
+        let buffer: Buffer | undefined = undefined
         switch (format) {
           case 'jpeg':
           case 'jpg':
-            await sharp(imagePath).jpeg({ quality }).toFile(imagePath)
+            buffer = await sharp(imagePath).jpeg({ quality }).toBuffer()
             break
           case 'png':
-            await sharp(imagePath).png({ quality }).toFile(imagePath)
+            buffer = await sharp(imagePath).png({ quality }).toBuffer()
             break
           case 'webp':
-            await sharp(imagePath).webp({ quality }).toFile(imagePath)
+            buffer = await sharp(imagePath).webp({ quality }).toBuffer()
             break
           default:
             throw new Error('Unsupported image format')
+        }
+
+        if (buffer) {
+          await sharp(buffer).toFile(imagePath)
+        } else {
+          throw new Error('Error compressing image')
         }
 
         const image = getImageData(imagePath)
@@ -78,5 +90,50 @@ export const imageRouter = router({
       console.error('Error trimming image:', error)
       throw error
     }
-  })
+  }),
+  // valid options are width and height numbers, width number and height 'auto' or width 'auto' and height number
+  resize: procedure
+    .input(
+      z
+        .object({
+          imagePath: z.string(),
+          width: z.number().positive().optional(),
+          height: z.number().positive().optional()
+        })
+        .refine((data) => data.width !== undefined || data.height !== undefined, {
+          message: 'You must provide at least one dimension: width or height.'
+        })
+    )
+    .mutation(async ({ input }) => {
+      const { imagePath, width, height } = input
+      try {
+        const buffer = await sharp(imagePath).resize({ width, height, fit: 'inside' }).toBuffer()
+
+        // save the resized image to the same path
+        await sharp(buffer).toFile(imagePath)
+
+        const image = getImageData(imagePath)
+        return image
+      } catch (error) {
+        console.error('Error resizing image:', error)
+        throw error
+      }
+    }),
+  clearMetadata: procedure
+    .input(z.object({ imagePath: z.string() }))
+    .mutation(async ({ input }) => {
+      const { imagePath } = input
+      try {
+        // remove all identifiable metadata from the image
+        // then resave it to the same path
+        const buffer = await sharp(imagePath).toBuffer()
+        await sharp(buffer).toFile(imagePath)
+
+        const image = getImageData(imagePath)
+        return image
+      } catch (error) {
+        console.error('Error clearing metadata:', error)
+        throw error
+      }
+    })
 })

@@ -2,13 +2,14 @@ import { ConvertBlockSchema } from '@renderer/lib/schemas'
 import { replaceVariables } from '@renderer/lib/utils'
 import { z } from 'zod'
 import { useCreateTempFile } from './file.hooks'
-import { useCompressImage, useConvertImage, useTrimImage } from './image.hooks'
+import { useCompressImage, useConvertImage, useResizeImage, useTrimImage } from './image.hooks'
 
 export const useImageProcessing = () => {
   const { mutateAsync: createTempFile } = useCreateTempFile()
   const { mutateAsync: _convertImage } = useConvertImage()
   const { mutateAsync: _compressImage } = useCompressImage()
   const { mutateAsync: _trimImage } = useTrimImage()
+  const { mutateAsync: _resizeImage } = useResizeImage()
 
   const createTempImage = async (imagePath: string) => {
     try {
@@ -20,8 +21,14 @@ export const useImageProcessing = () => {
     }
   }
 
-  const resizeImage = async (imagePath: string, width: number, height: number) => {
-    console.log('Resizing image', imagePath, 'to', width, 'x', height)
+  const resizeImage = async (
+    imagePath: string,
+    dimensions:
+      | { width: number; height: number }
+      | { width: number; height: undefined }
+      | { height: number; width: undefined }
+  ) => {
+    await _resizeImage({ imagePath, width: dimensions.width, height: dimensions.height })
   }
   const renameImage = async (originalName: string, newName: string, imageIndex: number) => {
     const variables = {

@@ -1,5 +1,5 @@
 import { Controller, useFormContext } from 'react-hook-form'
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/Card'
 import { Input } from '../ui/Input'
 import { Label } from '../ui/Label'
 import { RemoveBlock } from '../RemoveBlock'
@@ -222,9 +222,18 @@ export const ResizeBlock = ({ remove, index }: ResizeBlockProps) => {
     <Card className="bg-background  relative w-96 ">
       <RemoveBlock onClick={() => remove(index)} />
       <CardHeader>
-        <CardTitle>Resize Block</CardTitle>
+        <CardTitle>Resize Image</CardTitle>
+        <CardDescription>
+          Resize the image to a specific width and height. You can also choose to resize it
+          proportionally.
+        </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4">
+        {/* theyre 3 seperate components for typescript purposes
+          otherwise there was no safe way to access the correct schema
+          specally in errors
+        */}
+
         {mode === 'fixed' && <ResizeFixed index={index} />}
         {mode === 'proportionalWidth' && <ResizeProportionalWidth index={index} />}
         {mode === 'proportionalHeight' && <ResizeProportionalHeight index={index} />}

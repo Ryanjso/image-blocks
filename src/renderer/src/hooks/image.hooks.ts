@@ -11,3 +11,7 @@ export const useCompressImage = (options?: ReactQueryOptions['image']['compress'
 export const useTrimImage = (options?: ReactQueryOptions['image']['trim']) => {
   return trpc.image.trim.useMutation(options)
 }
+
+export const useResizeImage = (options?: ReactQueryOptions['image']['resize']) => {
+  return trpc.image.resize.useMutation(options)
+}
