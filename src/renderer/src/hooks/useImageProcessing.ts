@@ -2,7 +2,13 @@ import { ConvertBlockSchema } from '@renderer/lib/schemas'
 import { replaceVariables } from '@renderer/lib/utils'
 import { z } from 'zod'
 import { useCreateTempFile } from './file.hooks'
-import { useCompressImage, useConvertImage, useResizeImage, useTrimImage } from './image.hooks'
+import {
+  useClearMetadata,
+  useCompressImage,
+  useConvertImage,
+  useResizeImage,
+  useTrimImage
+} from './image.hooks'
 
 export const useImageProcessing = () => {
   const { mutateAsync: createTempFile } = useCreateTempFile()
@@ -10,6 +16,7 @@ export const useImageProcessing = () => {
   const { mutateAsync: _compressImage } = useCompressImage()
   const { mutateAsync: _trimImage } = useTrimImage()
   const { mutateAsync: _resizeImage } = useResizeImage()
+  const { mutateAsync: _clearMetadata } = useClearMetadata()
 
   const createTempImage = async (imagePath: string) => {
     try {
@@ -60,6 +67,10 @@ export const useImageProcessing = () => {
     await _trimImage({ imagePath })
   }
 
+  const clearMetadata = async (imagePath: string) => {
+    await _clearMetadata({ imagePath })
+  }
+
   return {
     createTempImage,
     resizeImage,
@@ -67,6 +78,7 @@ export const useImageProcessing = () => {
     cropImage,
     convertImage,
     compressImage,
-    trimImage
+    trimImage,
+    clearMetadata
   }
 }

@@ -15,3 +15,7 @@ export const useTrimImage = (options?: ReactQueryOptions['image']['trim']) => {
 export const useResizeImage = (options?: ReactQueryOptions['image']['resize']) => {
   return trpc.image.resize.useMutation(options)
 }
+
+export const useClearMetadata = (options?: ReactQueryOptions['image']['clearMetadata']) => {
+  return trpc.image.clearMetadata.useMutation(options)
+}

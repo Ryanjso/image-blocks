@@ -32,6 +32,7 @@ import { OutputDirectory } from './components/OutputDirectory'
 import { ImageUpload } from './components/ImageUpload'
 import { getUniqueImages, isTRPCClientError } from './lib/utils'
 import { useSaveFile } from './hooks/file.hooks'
+import { RemoveMetadataBlock } from './components/blocks/RemoveMetadataBlock'
 
 const FlowSchema = z.object({
   blocks: z.array(BlockSchema)
@@ -81,7 +82,8 @@ const Main = () => {
     cropImage,
     convertImage,
     compressImage,
-    trimImage
+    trimImage,
+    clearMetadata
   } = useImageProcessing()
 
   const methods = useForm<FlowFormValues>({
@@ -152,6 +154,9 @@ const Main = () => {
       case 'trim':
         append({ type: 'trim' })
         break
+      case 'removeMetadata':
+        append({ type: 'removeMetadata' })
+        break
     }
   }
 
@@ -212,6 +217,9 @@ const Main = () => {
           case 'trim':
             await trimImage(tempImagePath)
             break
+          case 'removeMetadata':
+            await clearMetadata(tempImagePath)
+            break
         }
       }
 
@@ -263,15 +271,31 @@ const Main = () => {
     }
   }
 
+  const handleRunClick = async () => {
+    await handleSubmit((data) => onSubmit(data))()
+  }
+
+  const clearAllImages = () => {
+    setImages([])
+  }
+
+  const clearAllBlocks = () => {
+    methods.reset({ blocks: [] })
+  }
+
+  const clearAll = () => {
+    clearAllImages()
+    clearAllBlocks()
+  }
+
   return (
     <div className="font-sans pb-16 relative">
-      <div className="p-3 draggable sticky top-0 z-10">
-        <div className="bg-background py-2 rounded-lg border-2 border-slate-200 flex justify-end px-2 sticky top-0">
-          <Button
-            onClick={handleSubmit((data) => onSubmit(data))}
-            className="no-drag"
-            disabled={isRunning}
-          >
+      <div className="p-3 draggable sticky top-0 z-50">
+        <div className="bg-background py-2 rounded-lg border-2 border-slate-200 flex justify-end px-2 sticky top-0 gap-2">
+          <Button onClick={clearAll} className="no-drag" disabled={isRunning} variant="ghost">
+            Clear all
+          </Button>
+          <Button onClick={handleRunClick} className="no-drag" disabled={isRunning}>
             <Play size={16} strokeWidth={2} />
             Run
           </Button>
@@ -292,7 +316,8 @@ const Main = () => {
           />
         </div>
       </div>
-      <div className=" gap-2 w-full mt-12 px-3 max-w-[900px] mx-auto flex flex-col">
+      {images.length > 0 && <div className="w-1 h-8 bg-slate-300 mx-auto my-2 rounded" />}
+      <div className="w-full px-3 max-w-[900px] mx-auto flex flex-col gap-2">
         {images.map((image, index) => (
           <FileBlock
             key={image.path}
@@ -301,6 +326,14 @@ const Main = () => {
             onRunClick={handleSubmit((data) => onSubmit(data, index))}
           />
         ))}
+        {/* {images.length === 0 && (
+          <div className="  bg-white border-2 border-slate-200 rounded-lg mx-auto p-1 w-96 ">
+            <div className="h-14 flex items-center justify-center">
+              <span className="text-center text-sm text-slate-500 w-full">No images added yet</span>
+            </div>
+          </div>
+        )} */}
+        <div className="w-1 h-8 bg-slate-300 mx-auto my-2 rounded" />
       </div>
       {/* <div className="bg-background w-full rounded-3xl border-2 border-slate-200 relative flex items-center justify-center max-h-[500px]">
         <div className="absolute top-[calc(100%+6px)] left-1/2 -translate-x-1/2">
@@ -325,7 +358,7 @@ const Main = () => {
         </div> */}
 
         <FormProvider<FlowFormValues> {...methods}>
-          <div className="mt-10">
+          <div className="">
             {blocks.length === 0 && (
               <div className="flex justify-center text-secondary-foreground">
                 <DropdownMenu>
@@ -357,6 +390,11 @@ const Main = () => {
                   case 'rename':
                     BlockComponent = <RenameBlock key={block.id} index={index} remove={remove} />
                     break
+                  case 'removeMetadata':
+                    BlockComponent = (
+                      <RemoveMetadataBlock key={block.id} index={index} remove={remove} />
+                    )
+                    break
                   // Add cases for other block types
 
                   default:
@@ -367,7 +405,7 @@ const Main = () => {
                   <div key={index}>
                     {BlockComponent}
                     {index < blocks.length - 1 && (
-                      <div className="w-1 h-8 bg-slate-300 mx-auto my-1"></div>
+                      <div className="w-1 h-8 bg-slate-300 mx-auto my-1" />
                     )}
                   </div>
                 )
@@ -376,7 +414,7 @@ const Main = () => {
 
             {blocks.length > 0 && (
               <>
-                <div className="w-1 h-8 bg-slate-300 mx-auto my-1"></div>
+                <div className="w-1 h-8 bg-slate-300 mx-auto mb-1 mt-2 rounded" />
                 <div className="flex justify-center text-secondary-foreground">
                   <DropdownMenu>
                     <DropdownMenuTrigger>
@@ -397,12 +435,4 @@ const Main = () => {
   )
 }
 
-const WrappedApp = () => {
-  return (
-    // <FlowProvider>
-    <App />
-    // </FlowProvider>
-  )
-}
-
-export default WrappedApp
+export default App

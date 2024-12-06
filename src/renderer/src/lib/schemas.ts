@@ -54,13 +54,18 @@ export const TrimBlockSchema = z.object({
   // threshold: z.number().int().min(0).max(255)
 })
 
+export const RemoveMetadataBlockSchema = z.object({
+  type: z.literal('removeMetadata')
+})
+
 export const BlockSchema = z.union([
   ResizeBlockSchema,
   RenameBlockSchema,
   CropBlockSchema,
   ConvertBlockSchema,
   CompressBlockSchema,
-  TrimBlockSchema
+  TrimBlockSchema,
+  RemoveMetadataBlockSchema
 ])
 
 export type Block = z.infer<typeof BlockSchema>

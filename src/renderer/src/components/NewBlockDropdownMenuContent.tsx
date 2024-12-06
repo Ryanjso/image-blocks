@@ -32,10 +32,7 @@ export const NewBlockDropdownMenuContent = ({
         <Scissors className="mr-2 h-4 w-4" />
         <span>Trim transparent pixels</span>
       </DropdownMenuItem>
-
-      {/* to do */}
-      {/* This includes details like camera model, GPS coordinates, timestamps, etc., that are stored in image files. */}
-      <DropdownMenuItem disabled>
+      <DropdownMenuItem onClick={() => addBlock('removeMetadata')}>
         <Fingerprint className="mr-2 h-4 w-4" />
         <span>Remove metadata</span>
       </DropdownMenuItem>

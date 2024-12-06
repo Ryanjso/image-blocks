@@ -12,6 +12,13 @@ export const imageRouter = router({
     .mutation(async ({ input }) => {
       const { imagePath, format } = input
 
+      // if format is the same as the original image, return the original image
+      const metadata = await sharp(imagePath).metadata()
+      if (metadata.format === format) {
+        const image = getImageData(imagePath)
+        return image
+      }
+
       try {
         const directory = path.dirname(imagePath)
         const fileName = path.basename(imagePath, path.extname(imagePath))
@@ -21,8 +28,8 @@ export const imageRouter = router({
         const buffer = await sharp(imagePath).toFormat(format).toBuffer()
         await sharp(buffer).toFile(newPath)
 
-        // delete the original (temporary) image path
-        fs.unlinkSync(imagePath)
+        // delete the original (temporary) image path, assuming we have a new image path
+        if (imagePath !== newPath) fs.unlinkSync(imagePath)
 
         const image = getImageData(newPath)
 
