@@ -1,6 +1,11 @@
-import { Play, PlusCircle } from 'lucide-react'
+import { ChevronDown, Play, PlusCircle } from 'lucide-react'
 // import { Curve } from './assets/svg/curve'
-import { DropdownMenu, DropdownMenuTrigger } from './components/ui/DropdownMenu'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from './components/ui/DropdownMenu'
 import { useState } from 'react'
 import { ImageWithStatus, ImageStatus } from 'src/types'
 import { ResizeBlock } from './components/blocks/ResizeBlock'
@@ -275,8 +280,12 @@ const Main = () => {
     await handleSubmit((data) => onSubmit(data))()
   }
 
-  const clearAllImages = () => {
-    setImages([])
+  const clearAllImages = (isOnlyProcessed = false) => {
+    if (isOnlyProcessed === true) {
+      setImages((prevImages) => prevImages.filter((image) => image.status !== 'success'))
+    } else {
+      setImages([])
+    }
   }
 
   const clearAllBlocks = () => {
@@ -292,9 +301,42 @@ const Main = () => {
     <div className="font-sans pb-16 relative">
       <div className="p-3 draggable sticky top-0 z-50">
         <div className="bg-background py-2 rounded-lg border-2 border-slate-200 flex justify-end px-2 sticky top-0 gap-2">
-          <Button onClick={clearAll} className="no-drag" disabled={isRunning} variant="ghost">
-            Clear all
-          </Button>
+          <div className="flex items-center no-drag">
+            <Button variant="outline" className={'rounded-r-none'} onClick={clearAll}>
+              Clear all
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className={'rounded-l-none border-l-0 px-2'}>
+                  <ChevronDown />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem
+                  onClick={() => {
+                    clearAllImages()
+                  }}
+                >
+                  Clear all images
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    clearAllImages(true)
+                  }}
+                >
+                  Clear only completed images
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    clearAllBlocks()
+                  }}
+                >
+                  Clear all blocks
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
           <Button onClick={handleRunClick} className="no-drag" disabled={isRunning}>
             <Play size={16} strokeWidth={2} />
             Run
