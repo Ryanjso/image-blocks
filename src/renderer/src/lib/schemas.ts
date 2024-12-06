@@ -1,10 +1,29 @@
 import { z } from 'zod'
 
-export const ResizeBlockSchema = z.object({
+export const FixedResizeBlockSchema = z.object({
+  mode: z.literal('fixed'),
   type: z.literal('resize'),
   width: z.number().positive().int(),
   height: z.number().positive().int()
 })
+
+export const ProportionalWidthResizeBlockSchema = z.object({
+  mode: z.literal('proportionalWidth'),
+  type: z.literal('resize'),
+  height: z.number().positive().int()
+})
+
+export const ProportionalHeightResizeBlockSchema = z.object({
+  mode: z.literal('proportionalHeight'),
+  type: z.literal('resize'),
+  width: z.number().positive().int()
+})
+
+export const ResizeBlockSchema = z.discriminatedUnion('mode', [
+  FixedResizeBlockSchema,
+  ProportionalWidthResizeBlockSchema,
+  ProportionalHeightResizeBlockSchema
+])
 
 export const RenameBlockSchema = z.object({
   type: z.literal('rename'),

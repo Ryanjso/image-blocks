@@ -4,17 +4,23 @@ import { Label } from '../ui/Label'
 import { Slider } from '../ui/Slider'
 import { Input } from '../ui/Input'
 import { RemoveBlock } from '../RemoveBlock'
+import { z } from 'zod'
+import { CompressBlockSchema } from '@renderer/lib/schemas'
 
 interface CompressBlockProps {
   index: number
   remove: (index: number) => void
 }
+const CompressBlockSchemaArr = z.object({
+  blocks: z.array(CompressBlockSchema)
+})
+type CompressBlockFormValues = z.infer<typeof CompressBlockSchemaArr>
 
 export const CompressBlock = ({ remove, index }: CompressBlockProps) => {
   const {
     control,
     formState: { errors }
-  } = useFormContext()
+  } = useFormContext<CompressBlockFormValues>()
 
   return (
     <Card className="bg-background  relative w-96 ">
@@ -50,6 +56,7 @@ export const CompressBlock = ({ remove, index }: CompressBlockProps) => {
                   className="w-20"
                 />
               </div>
+
               {errors?.blocks?.[index]?.quality && (
                 <span>{errors.blocks[index].quality.message}</span>
               )}

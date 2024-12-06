@@ -136,7 +136,7 @@ const Main = () => {
   const onAddBlock = (type: Block['type']) => {
     switch (type) {
       case 'resize':
-        append({ type: 'resize', width: 100, height: 100 })
+        append({ type: 'resize', width: 1024, mode: 'proportionalHeight' })
         break
       case 'rename':
         append({ type: 'rename', newName: '' })
@@ -317,7 +317,7 @@ const Main = () => {
           </div>
         </div> */}
 
-        <FormProvider {...methods}>
+        <FormProvider<FlowFormValues> {...methods}>
           <div className="mt-10">
             {blocks.length === 0 && (
               <div className="flex justify-center text-secondary-foreground">
