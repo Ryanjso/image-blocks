@@ -355,7 +355,7 @@ const Main = () => {
                       clearAllImages(true)
                     }}
                   >
-                    Clear only completed images
+                    Clear completed images
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => {
