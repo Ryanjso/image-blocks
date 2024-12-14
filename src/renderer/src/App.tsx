@@ -6,11 +6,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from './components/ui/DropdownMenu'
-import { Ref, useState } from 'react'
+import { useState } from 'react'
 import { ImageWithStatus, ImageStatus } from '@shared/types'
 import { ResizeBlock } from './components/blocks/ResizeBlock'
 import { NewBlockDropdownMenuContent } from './components/NewBlockDropdownMenuContent'
-import { FieldErrors, FormProvider, useFieldArray, useForm } from 'react-hook-form'
+import { FieldErrors, useFieldArray, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Block, BlockSchema } from './lib/schemas'
@@ -363,7 +363,6 @@ const Main = () => {
   }
 
   const onInvalid = (data: FieldErrors<FlowFormValues>) => {
-    console.log('Invalid form data:', data)
     const formBlocks = data.blocks
     if (!formBlocks) return
     // find the first block with an error and scroll the ref into view
@@ -371,6 +370,7 @@ const Main = () => {
       if (formBlocks[block]) {
         const fieldError = formBlocks[block]
         const fieldErrorRef = fieldError?.ref
+
         if (!fieldErrorRef) continue
         if (fieldErrorRef instanceof Element) {
           fieldErrorRef.scrollIntoView({ behavior: 'smooth', block: 'center' })

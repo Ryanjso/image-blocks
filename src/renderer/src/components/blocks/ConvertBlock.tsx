@@ -10,6 +10,8 @@ import {
   SelectValue
 } from '../ui/Select'
 import { RemoveBlock } from '../RemoveBlock'
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/Form'
+import { FormInput } from 'lucide-react'
 
 interface ConvertBlockProps {
   index: number
@@ -29,28 +31,28 @@ export const ConvertBlock = ({ remove, index }: ConvertBlockProps) => {
         <CardTitle>Convert Image Format</CardTitle>
       </CardHeader>
       <CardContent className="grid gap-1.5">
-        <Label>Output type</Label>
-        <Controller
+        <FormField
           name={`blocks.${index}.outputType`}
           control={control}
           render={({ field }) => (
-            <div>
-              <Select onValueChange={(value) => field.onChange(value)} value={field.value}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select an image type"></SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem value="png">PNG</SelectItem>
-                    <SelectItem value="jpeg">JPEG</SelectItem>
-                    <SelectItem value="webp">WEBP</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-              {errors?.blocks?.[index]?.outputType && (
-                <span>{errors.blocks[index].outputType.message}</span>
-              )}
-            </div>
+            <FormItem>
+              <FormLabel>Output type</FormLabel>
+              <FormControl>
+                <Select onValueChange={(value) => field.onChange(value)} value={field.value}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select an image type"></SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="png">PNG</SelectItem>
+                      <SelectItem value="jpeg">JPEG</SelectItem>
+                      <SelectItem value="webp">WEBP</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              {errors?.blocks?.[index]?.outputType && <FormMessage />}
+            </FormItem>
           )}
         />
         <div></div>

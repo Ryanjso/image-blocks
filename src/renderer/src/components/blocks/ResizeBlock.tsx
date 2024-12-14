@@ -12,6 +12,7 @@ import {
 import { z } from 'zod'
 import { Button } from '../ui/Button'
 import { Link, Unlink } from 'lucide-react'
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/Form'
 
 interface ResizeBlockProps {
   index: number
@@ -36,26 +37,27 @@ const ResizeFixed = ({ index }: { index: number }) => {
   return (
     <>
       <div className="grid gap-1.5">
-        <Label>Width</Label>
-        <div className="flex gap-2">
-          <Controller
+        <div className="flex gap-2 items-end">
+          <FormField
             name={`blocks.${index}.width`}
             control={control}
             render={({ field }) => (
-              <>
-                <Input
-                  type="number"
-                  value={field.value}
-                  onChange={(e) => field.onChange(Number(e.target.value))}
-                />
-                {errors?.blocks?.[index]?.width && (
-                  <span>{errors.blocks[index].width.message}</span>
-                )}
-              </>
+              <FormItem className="w-full">
+                <FormLabel>Width</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="number"
+                    value={field.value}
+                    onChange={(e) => field.onChange(Number(e.target.value))}
+                  />
+                </FormControl>
+                {errors?.blocks?.[index]?.width && <FormMessage />}
+              </FormItem>
             )}
           />
           {/* button to change mode to 'proportionalHeight' */}
-          <Controller
+          <FormField
             name={`blocks.${index}.mode`}
             control={control}
             render={({ field }) => (
@@ -73,26 +75,27 @@ const ResizeFixed = ({ index }: { index: number }) => {
       </div>
 
       <div className="grid gap-1.5">
-        <Label>Height</Label>
-        <div className="flex gap-2">
-          <Controller
+        <div className="flex gap-2 items-end">
+          <FormField
             name={`blocks.${index}.height`}
             control={control}
             render={({ field }) => (
-              <>
-                <Input
-                  type="number"
-                  value={field.value}
-                  onChange={(e) => field.onChange(Number(e.target.value))}
-                />
-                {errors?.blocks?.[index]?.height && (
-                  <span>{errors.blocks[index].height.message}</span>
-                )}
-              </>
+              <FormItem className="w-full">
+                <FormLabel>Height</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="number"
+                    value={field.value}
+                    onChange={(e) => field.onChange(Number(e.target.value))}
+                  />
+                </FormControl>
+                {errors?.blocks?.[index]?.height && <FormMessage />}
+              </FormItem>
             )}
           />
           {/* button to change mode to 'proportionalWidth' */}
-          <Controller
+          <FormField
             name={`blocks.${index}.mode`}
             control={control}
             render={({ field }) => (
@@ -124,31 +127,32 @@ const ResizeProportionalWidth = ({ index }: { index: number }) => {
 
   return (
     <>
-      <div className="grid gap-1.5">
+      <FormItem>
         <Label>Width</Label>
         <Input type="number" disabled placeholder="Automatic proportional" />
-      </div>
+      </FormItem>
       <div className="grid gap-1.5">
-        <Label>Height</Label>
-        <div className="flex gap-2">
-          <Controller
+        <div className="flex gap-2 items-end">
+          <FormField
             name={`blocks.${index}.height`}
             control={control}
             render={({ field }) => (
-              <>
-                <Input
-                  type="number"
-                  value={field.value}
-                  onChange={(e) => field.onChange(Number(e.target.value))}
-                />
-                {errors?.blocks?.[index]?.height && (
-                  <span>{errors.blocks[index].height.message}</span>
-                )}
-              </>
+              <FormItem className="w-full">
+                <FormLabel>Height</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="number"
+                    value={field.value}
+                    onChange={(e) => field.onChange(Number(e.target.value))}
+                  />
+                </FormControl>
+                {errors?.blocks?.[index]?.height && <FormMessage />}
+              </FormItem>
             )}
           />
           {/* button to change mode to 'proportionalHeight' */}
-          <Controller
+          <FormField
             name={`blocks.${index}.mode`}
             control={control}
             render={({ field }) => (
@@ -176,26 +180,27 @@ const ResizeProportionalHeight = ({ index }: { index: number }) => {
   return (
     <>
       <div className="grid gap-1.5">
-        <Label>Width</Label>
-        <div className="flex gap-2">
-          <Controller
+        <div className="flex gap-2 items-end">
+          <FormField
             name={`blocks.${index}.width`}
             control={control}
             render={({ field }) => (
-              <>
-                <Input
-                  type="number"
-                  value={field.value}
-                  onChange={(e) => field.onChange(Number(e.target.value))}
-                />
-                {errors?.blocks?.[index]?.width && (
-                  <span>{errors.blocks[index].width.message}</span>
-                )}
-              </>
+              <FormItem className="w-full">
+                <FormLabel>Width</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="number"
+                    value={field.value}
+                    onChange={(e) => field.onChange(Number(e.target.value))}
+                  />
+                </FormControl>
+                {errors?.blocks?.[index]?.width && <FormMessage />}
+              </FormItem>
             )}
           />
           {/* button to change mode to 'fixed' */}
-          <Controller
+          <FormField
             name={`blocks.${index}.mode`}
             control={control}
             render={({ field }) => (
@@ -206,10 +211,10 @@ const ResizeProportionalHeight = ({ index }: { index: number }) => {
           />
         </div>
       </div>
-      <div className="grid gap-1.5">
+      <FormItem>
         <Label>Height</Label>
         <Input type="number" disabled placeholder="Automatic proportional" />
-      </div>
+      </FormItem>
     </>
   )
 }
