@@ -27,7 +27,9 @@ export const ResizeBlockSchema = z.discriminatedUnion('mode', [
 
 export const RenameBlockSchema = z.object({
   type: z.literal('rename'),
-  newName: z.string().min(1)
+  newName: z.string().min(1, {
+    message: 'New Name must not be empty'
+  })
 })
 
 export const CropBlockSchema = z.object({

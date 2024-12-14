@@ -89,7 +89,8 @@ export const imageRouter = router({
     try {
       // todo figure out real transparent not top left pixel
       // https://github.com/lovell/sharp/issues/3608#issuecomment-1501203805
-      await sharp(imagePath).trim().toFile(imagePath) // this currently uses the top left pixel
+      const buffer = await sharp(imagePath).trim().toBuffer() // this currently uses the top left pixel
+      await sharp(buffer).toFile(imagePath)
 
       const image = getImageData(imagePath)
 

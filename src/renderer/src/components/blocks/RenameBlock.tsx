@@ -1,8 +1,14 @@
-import { Controller, useFormContext } from 'react-hook-form'
+import { useFormContext } from 'react-hook-form'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/Card'
-import { Label } from '../ui/Label'
 import { Input } from '../ui/Input'
-import { FormDescription } from '../ui/Form'
+import {
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from '../ui/Form'
 import { Code, P } from '../ui/Typography'
 import { RemoveBlock } from '../RemoveBlock'
 interface RenameBlockProps {
@@ -56,23 +62,21 @@ export const RenameBlock = ({ remove, index }: RenameBlockProps) => {
         </div>
 
         <div className="grid gap-1.5">
-          <Label>New Name</Label>
-          <Controller
+          <FormField
             name={`blocks.${index}.newName`}
             control={control}
             render={({ field }) => (
-              <>
-                <Input
-                  type="text"
-                  value={field.value}
-                  onChange={(e) => field.onChange(e.target.value)}
-                  className="w-full"
-                  placeholder="e.g. {name}_{index}_compressed"
-                />
-                {errors?.blocks?.[index]?.newName && (
-                  <span>{errors.blocks[index].newName.message}</span>
-                )}
-              </>
+              <FormItem>
+                <FormLabel>New Name</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    className="w-full"
+                    placeholder="e.g. {name}_{index}_compressed"
+                  />
+                </FormControl>
+                {errors?.blocks?.[index]?.newName && <FormMessage />}
+              </FormItem>
             )}
           />
           <FormDescription>

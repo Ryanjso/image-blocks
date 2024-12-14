@@ -6,11 +6,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from './components/ui/DropdownMenu'
-import { useState } from 'react'
+import { Ref, useState } from 'react'
 import { ImageWithStatus, ImageStatus } from '@shared/types'
 import { ResizeBlock } from './components/blocks/ResizeBlock'
 import { NewBlockDropdownMenuContent } from './components/NewBlockDropdownMenuContent'
-import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
+import { FieldErrors, FormProvider, useFieldArray, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Block, BlockSchema } from './lib/schemas'
@@ -41,6 +41,7 @@ import { RemoveMetadataBlock } from './components/blocks/RemoveMetadataBlock'
 import { Toaster } from './components/ui/Toaster'
 import { useToast } from './hooks/useToast'
 import { ALLOWED_FILE_TYPES } from '@shared/constants'
+import { Form } from './components/ui/Form'
 
 const FlowSchema = z.object({
   blocks: z.array(BlockSchema)
@@ -154,14 +155,14 @@ const Main = () => {
         description: (
           <div className="space-y-2">
             <p>Only the following file types are allowed: {ALLOWED_FILE_TYPES.join(', ')}</p>
-            <p>
-              The following files are not allowed:{' '}
+            <div>
+              <p>The following files are not allowed:</p>
               <ul className="list-disc">
                 {notAllowedFiles.map((file) => (
                   <li key={file}>{file}</li>
                 ))}
               </ul>
-            </p>
+            </div>
           </div>
         ),
         variant: 'destructive',
@@ -361,6 +362,24 @@ const Main = () => {
     clearAllBlocks()
   }
 
+  const onInvalid = (data: FieldErrors<FlowFormValues>) => {
+    console.log('Invalid form data:', data)
+    const formBlocks = data.blocks
+    if (!formBlocks) return
+    // find the first block with an error and scroll the ref into view
+    for (const block in formBlocks) {
+      if (formBlocks[block]) {
+        const fieldError = formBlocks[block]
+        const fieldErrorRef = fieldError?.ref
+        if (!fieldErrorRef) continue
+        if (fieldErrorRef instanceof Element) {
+          fieldErrorRef.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          return
+        }
+      }
+    }
+  }
+
   return (
     <>
       <div className="font-sans pb-16 relative">
@@ -403,7 +422,10 @@ const Main = () => {
             </div>
 
             <Button
-              onClick={handleSubmit((data) => onSubmit(data))}
+              onClick={handleSubmit(
+                (data) => onSubmit(data),
+                (error) => onInvalid(error)
+              )}
               className="no-drag"
               disabled={isRunning}
             >
@@ -437,7 +459,10 @@ const Main = () => {
               key={image.path}
               image={image}
               remove={handleRemoveImage}
-              onRunClick={handleSubmit((data) => onSubmit(data, index))}
+              onRunClick={handleSubmit(
+                (data) => onSubmit(data, index),
+                (error) => onInvalid(error)
+              )}
             />
           ))}
           {/* {images.length === 0 && (
@@ -471,7 +496,7 @@ const Main = () => {
           </div>
         </div> */}
 
-          <FormProvider<FlowFormValues> {...methods}>
+          <Form<FlowFormValues> {...methods}>
             <div className="">
               {blocks.length === 0 && (
                 <div className="flex justify-center text-secondary-foreground">
@@ -545,7 +570,7 @@ const Main = () => {
                 </>
               )}
             </div>
-          </FormProvider>
+          </Form>
         </div>
       </div>
       <Toaster />
