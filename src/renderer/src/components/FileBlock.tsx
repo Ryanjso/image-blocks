@@ -1,7 +1,8 @@
 import { ArrowRight, Loader2, Play, SquareArrowOutUpRight, X } from 'lucide-react'
-import { ImageWithStatus } from 'src/types'
+
 import { Button } from './ui/Button'
 import { useOpenFileManagerToPath } from '@renderer/hooks/system.hooks'
+import { ImageWithStatus } from '@shared/types'
 
 const formatSize = (size: number) => {
   if (size < 1024) {
@@ -142,10 +143,8 @@ export const FileBlock = ({
             </div>
           </div>
         ) : image.status === 'error' ? (
-          <div className="px-4 flex justify-between flex-1">
-            <span className=" text-sm text-destructive">
-              There was an error processing this image
-            </span>
+          <div className="px-4 flex justify-between flex-1 items-center">
+            <span className="text-sm text-destructive">{image.errorMessage}</span>
           </div>
         ) : (
           // Idle state
