@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger
 } from './components/ui/DropdownMenu'
 import { useState } from 'react'
-import { ImageWithStatus, ImageStatus } from 'src/types'
+import { ImageWithStatus, ImageStatus } from '@shared/types'
 import { ResizeBlock } from './components/blocks/ResizeBlock'
 import { NewBlockDropdownMenuContent } from './components/NewBlockDropdownMenuContent'
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
@@ -40,6 +40,7 @@ import { useSaveFile } from './hooks/file.hooks'
 import { RemoveMetadataBlock } from './components/blocks/RemoveMetadataBlock'
 import { Toaster } from './components/ui/Toaster'
 import { useToast } from './hooks/useToast'
+import { ALLOWED_FILE_TYPES } from '@shared/constants'
 
 const FlowSchema = z.object({
   blocks: z.array(BlockSchema)
@@ -136,6 +137,39 @@ const Main = () => {
   }
 
   const handleDropImages = (filePaths: string[]) => {
+    // check the uploaded file extensions to make sure they are in the allow list
+    // create a list of the paths of the files that are not allowed
+    // if the list is not empty, show a toast message to the user with the list of the files that are not allowed
+
+    const notAllowedFiles = filePaths.filter((filePath) => {
+      const extension = filePath.split('.').pop()?.toLowerCase()
+      if (!extension) return true
+      const allowedFileTypes: string[] = [...ALLOWED_FILE_TYPES] // for typescript
+      return !allowedFileTypes.includes(extension)
+    })
+
+    if (notAllowedFiles.length > 0) {
+      toast({
+        title: 'Invalid file type',
+        description: (
+          <div className="space-y-2">
+            <p>Only the following file types are allowed: {ALLOWED_FILE_TYPES.join(', ')}</p>
+            <p>
+              The following files are not allowed:{' '}
+              <ul className="list-disc">
+                {notAllowedFiles.map((file) => (
+                  <li key={file}>{file}</li>
+                ))}
+              </ul>
+            </p>
+          </div>
+        ),
+        variant: 'destructive',
+        duration: 7000
+      })
+      return
+    }
+
     addImages({ filePaths })
   }
 

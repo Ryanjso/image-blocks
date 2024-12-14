@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
 import { getImagesData } from '../helpers/system.helpers'
 import { userPreferencesStorage } from '../lib/storage'
+import { ALLOWED_FILE_TYPES } from '@shared/constants'
 
 export const systemRouter = router({
   getDefaultDirectory: procedure.query(() => {
@@ -33,7 +34,7 @@ export const systemRouter = router({
   selectImages: procedure.mutation(async () => {
     const result = await dialog.showOpenDialog({
       properties: ['openFile', 'multiSelections'],
-      filters: [{ name: 'Images', extensions: ['jpg', 'jpeg', 'png', 'webp'] }]
+      filters: [{ name: 'Images', extensions: [...ALLOWED_FILE_TYPES] }]
     })
 
     if (result.canceled) return []

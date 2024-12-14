@@ -1,5 +1,5 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
-import { ImageOutputFormat, ImageWithStatus } from '../types'
+import { ImageOutputFormat, ImageWithStatus } from '../shared/types'
 
 declare global {
   interface Window {

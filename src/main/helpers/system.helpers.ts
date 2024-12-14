@@ -1,4 +1,4 @@
-import { BaseImage } from '../../types'
+import { BaseImage } from '../../shared/types'
 import * as path from 'path'
 import fs from 'fs'
 import sharp from 'sharp'

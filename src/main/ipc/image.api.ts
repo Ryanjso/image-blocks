@@ -5,10 +5,11 @@ import { z } from 'zod'
 import { getImageData } from '../helpers/system.helpers'
 import { TRPCError } from '@trpc/server'
 import fs from 'fs'
+import { ALLOWED_FILE_TYPES } from '../../shared/constants'
 
 export const imageRouter = router({
   convert: procedure
-    .input(z.object({ imagePath: z.string(), format: z.enum(['jpeg', 'png', 'webp', 'jpg']) }))
+    .input(z.object({ imagePath: z.string(), format: z.enum(ALLOWED_FILE_TYPES) }))
     .mutation(async ({ input }) => {
       const { imagePath, format } = input
 
