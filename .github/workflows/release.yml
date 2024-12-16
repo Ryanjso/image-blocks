@@ -31,7 +31,8 @@ jobs:
       #   run: npm run build:linux
 
       # Decode and import Developer ID Certificate
-      - name: Set up Code Signing Certificate
+      - name: Set up Code Signing Certificate for macOS
+        if: matrix.os == 'macos-latest'
         run: |
           echo "${{ secrets.CERTIFICATE_BASE64 }}" | base64 --decode > certificate.p12
           security create-keychain -p "" build.keychain
