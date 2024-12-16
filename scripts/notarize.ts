@@ -3,6 +3,9 @@ import type { AfterPackContext } from 'electron-builder'
 import { notarize } from '@electron/notarize'
 import path from 'path'
 
+import * as dotenv from 'dotenv'
+dotenv.config()
+
 export async function afterSign({
   appOutDir,
   packager,
@@ -39,11 +42,6 @@ export async function afterSign({
     console.warn('teamId must be provided in environment variable APPLE_TEAM_ID')
     return
   }
-
-  console.log('Notarizing with...')
-  console.log(`  primaryBundleId: ${appBundleId}`)
-  console.log(`  username: ${appleId}`)
-  console.log(`  file: ${appPath}`)
 
   await notarize({
     appPath,
