@@ -30,7 +30,22 @@ jobs:
       #   if: matrix.os == 'ubuntu-latest'
       #   run: npm run build:linux
 
+      # Decode and import Developer ID Certificate
+      - name: Set up Code Signing Certificate
+        run: |
+          echo "${{ secrets.CERTIFICATE_BASE64 }}" | base64 --decode > certificate.p12
+          security create-keychain -p "" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "" build.keychain
+          security import certificate.p12 -k build.keychain -P "${{ secrets.CERTIFICATE_PASSWORD }}" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
+
       - name: build-mac
+        env:
+          APPLE_USERNAME: ${{ secrets.APPLE_USERNAME }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APP_BUNDLE_ID: ${{ secrets.APP_BUNDLE_ID }}
         if: matrix.os == 'macos-latest'
         run: npm run build:mac
 
