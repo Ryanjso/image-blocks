@@ -1,7 +1,7 @@
+import { ImageWithStatus } from '@shared/types'
 import { TRPCClientError } from '@trpc/client'
 import { clsx, type ClassValue } from 'clsx'
 import { AppRouter } from 'src/main/ipc/api'
-import { ImageWithStatus } from 'src/types'
 import { twMerge } from 'tailwind-merge'
 
 export function cn(...inputs: ClassValue[]): string {

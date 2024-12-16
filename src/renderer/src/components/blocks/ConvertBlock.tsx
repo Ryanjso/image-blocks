@@ -1,6 +1,6 @@
-import { Controller, useFormContext } from 'react-hook-form'
+import { useFormContext } from 'react-hook-form'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card'
-import { Label } from '../ui/Label'
+
 import {
   Select,
   SelectContent,
@@ -11,7 +11,6 @@ import {
 } from '../ui/Select'
 import { RemoveBlock } from '../RemoveBlock'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/Form'
-import { FormInput } from 'lucide-react'
 
 interface ConvertBlockProps {
   index: number

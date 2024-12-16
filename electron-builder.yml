@@ -1,4 +1,4 @@
-appId: com.electron.app
+appId: ${APP_BUNDLE_ID}
 productName: imagine
 directories:
   buildResources: build
@@ -43,3 +43,4 @@ npmRebuild: false
 publish:
   provider: generic
   url: https://example.com/auto-updates
+afterSign: scripts/notarize.js

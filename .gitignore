@@ -3,3 +3,9 @@ dist
 out
 .DS_Store
 *.log*
+
+.env
+
+# dont commit the transpiled files
+scripts/notarize.js
+
