@@ -12,7 +12,8 @@ jobs:
     strategy:
       matrix:
         # ubuntu-latest if you want to build for Linux
-        os: [macos-latest, windows-latest]
+        # windows-latest if you want to build for Windows
+        os: [macos-latest]
 
     steps:
       - name: Check out Git repository
@@ -29,6 +30,10 @@ jobs:
       # - name: build-linux
       #   if: matrix.os == 'ubuntu-latest'
       #   run: npm run build:linux
+
+      # - name: build-win
+      #   if: matrix.os == 'windows-latest'
+      #   run: npm run build:win
 
       # Decode and import Developer ID Certificate
       - name: Set up Code Signing Certificate for macOS
@@ -47,12 +52,9 @@ jobs:
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           APP_BUNDLE_ID: ${{ secrets.APP_BUNDLE_ID }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: matrix.os == 'macos-latest'
         run: npm run build:mac
-
-      - name: build-win
-        if: matrix.os == 'windows-latest'
-        run: npm run build:win
 
       - name: release
         uses: softprops/action-gh-release@v1
