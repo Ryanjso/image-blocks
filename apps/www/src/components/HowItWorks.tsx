@@ -19,7 +19,7 @@ export default function HowItWorks() {
         <h2 className="text-3xl font-bold text-center mb-12">
           How It Works in 3 Simple Steps
         </h2>
-        <div className="flex flex-col md:flex-row justify-between items-center">
+        <div className="flex flex-col md:flex-row justify-evenly items-center md:space-x-4 max-w-7xl mx-auto">
           {steps.map((step, index) => (
             <div key={index} className="mb-8 md:mb-0 text-center">
               <div className="bg-indigo-600 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4">

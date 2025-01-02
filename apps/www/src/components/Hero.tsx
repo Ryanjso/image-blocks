@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { Github } from "lucide-react";
 
 export default function Hero() {
   return (
@@ -12,18 +13,12 @@ export default function Hero() {
           <p className="text-xl mb-8">
             Drag, Drop, and Customize Image Workflows with Open-Source Power.
           </p>
-          <div className="space-x-4">
-            <Button
-              size="lg"
-              className="bg-white text-indigo-700 hover:bg-indigo-100"
-            >
+          <div className="space-x-4 flex">
+            <Button size="lg" variant={"secondary"}>
               Download for Free
             </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="text-white border-white hover:bg-indigo-600"
-            >
+            <Button size="lg" variant="outline">
+              <Github className="mr-2" />
               View on GitHub
             </Button>
           </div>

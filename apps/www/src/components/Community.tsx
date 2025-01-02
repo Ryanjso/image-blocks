@@ -14,19 +14,9 @@ export default function Community() {
           accessible to everyone.
         </p>
         <div className="space-x-4">
-          <Button
-            size="lg"
-            className="bg-white text-indigo-700 hover:bg-indigo-100"
-          >
-            <Github className="w-5 h-5 mr-2" />
+          <Button size="lg" variant={"secondary"}>
+            <Github className="mr-2" />
             View on GitHub
-          </Button>
-          <Button
-            size="lg"
-            variant="outline"
-            className="text-white border-white hover:bg-indigo-600"
-          >
-            Join Our Discord
           </Button>
         </div>
       </div>
