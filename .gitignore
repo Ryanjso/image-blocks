@@ -9,3 +9,15 @@ out
 # dont commit the transpiled files
 scripts/notarize.js
 
+# ignore these above files in app/electron and app/web
+
+app/**/node_modules
+app/**/dist
+app/**/out
+app/**/.DS_Store
+app/**/*.log*
+
+app/**/.env
+
+app/electron/scripts/notarize.js
+
