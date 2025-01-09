@@ -1,5 +1,5 @@
 appId: ${APP_BUNDLE_ID}
-productName: imagine
+productName: ImageBlocks
 directories:
   buildResources: build
 files:
@@ -14,7 +14,7 @@ asarUnpack:
   - node_modules/sharp/**/*
   - node_modules/@img/**/*
 win:
-  executableName: imagine
+  executableName: ImageBlocks
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
