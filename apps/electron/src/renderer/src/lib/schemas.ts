@@ -47,7 +47,7 @@ export const ConvertBlockSchema = z.object({
 
 export const CompressBlockSchema = z.object({
   type: z.literal('compress'),
-  quality: z.number().int().min(90).max(100)
+  quality: z.number().int().min(1).max(100)
   // maxSize: eventually recursively compress until the image is under this size, optional
 })
 
