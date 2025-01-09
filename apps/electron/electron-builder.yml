@@ -14,7 +14,7 @@ asarUnpack:
   - node_modules/sharp/**/*
   - node_modules/@img/**/*
 win:
-  executableName: ImageBlocks
+  executableName: ${productName}
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
@@ -30,6 +30,7 @@ mac:
   notarize: false
 dmg:
   artifactName: ${productName}.${ext}
+  title: ${productName}
 linux:
   target:
     - AppImage
