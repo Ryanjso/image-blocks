@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { MAC_DOWNLOAD_URL } from "@/constants";
 import Link from "next/link";
+import { Github } from "lucide-react";
 
 export default function ClosingCTA() {
   return (
@@ -11,20 +12,14 @@ export default function ClosingCTA() {
           Join thousands of creators who are streamlining their image processing
           workflows with Image Blocks.
         </p>
-        <div className="space-x-4">
+        <div className="space-x-4 flex justify-center">
           <Link href={MAC_DOWNLOAD_URL} passHref>
-            <Button
-              size="lg"
-              className="bg-white text-indigo-700 hover:bg-indigo-100"
-            >
+            <Button size="lg" variant={"secondary"}>
               Download for Mac
             </Button>
           </Link>
-          <Button
-            size="lg"
-            variant="outline"
-            className="text-white border-white hover:bg-indigo-600"
-          >
+          <Button size="lg" variant="outline">
+            <Github className="mr-2" />
             View on GitHub
           </Button>
         </div>
