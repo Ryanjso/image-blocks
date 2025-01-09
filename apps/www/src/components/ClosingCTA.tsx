@@ -1,4 +1,6 @@
 import { Button } from "@/components/ui/button";
+import { MAC_DOWNLOAD_URL } from "@/constants";
+import Link from "next/link";
 
 export default function ClosingCTA() {
   return (
@@ -10,12 +12,14 @@ export default function ClosingCTA() {
           workflows with Image Blocks.
         </p>
         <div className="space-x-4">
-          <Button
-            size="lg"
-            className="bg-white text-indigo-700 hover:bg-indigo-100"
-          >
-            Download for Free
-          </Button>
+          <Link href={MAC_DOWNLOAD_URL} passHref>
+            <Button
+              size="lg"
+              className="bg-white text-indigo-700 hover:bg-indigo-100"
+            >
+              Download for Mac
+            </Button>
+          </Link>
           <Button
             size="lg"
             variant="outline"

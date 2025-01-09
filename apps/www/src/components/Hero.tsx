@@ -1,5 +1,7 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { MAC_DOWNLOAD_URL } from "@/constants";
 
 export default function Hero() {
   return (
@@ -13,12 +15,14 @@ export default function Hero() {
             Drag, Drop, and Customize Image Workflows with Open-Source Power.
           </p>
           <div className="space-x-4">
-            <Button
-              size="lg"
-              className="bg-white text-indigo-700 hover:bg-indigo-100"
-            >
-              Download for Free
-            </Button>
+            <Link href={MAC_DOWNLOAD_URL} passHref>
+              <Button
+                size="lg"
+                className="bg-white text-indigo-700 hover:bg-indigo-100"
+              >
+                Download for Mac
+              </Button>
+            </Link>
             <Button
               size="lg"
               variant="outline"
